@@ -19,7 +19,7 @@
 						<toolChain id="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug.1008101852" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.205381709" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.24048887" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F103C8Tx" valueType="string" />
-							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1012667088" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="GeometryDash-CE" valueType="string" />
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1012667088" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="ChromeDino-CE" valueType="string" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.core.1083960614" name="Core" superClass="fr.ac6.managedbuild.option.gnu.cross.core" valueType="stringList">
 								<listOptionValue builtIn="false" value="ARM Cortex-M3" />
 								<listOptionValue builtIn="false" value="CM3" />
@@ -28,7 +28,7 @@
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.2034756928" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" value="fr.ac6.managedbuild.option.gnu.cross.fpu.no" valueType="enumerated" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.933948874" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.soft" valueType="enumerated" />
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.137394714" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross" />
-							<builder buildPath="${workspace_loc:/GeometryDash-CE}/Debug" id="fr.ac6.managedbuild.builder.gnu.cross.1773050001" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross">
+							<builder buildPath="${workspace_loc:/ChromeDino-CE}/Debug" id="fr.ac6.managedbuild.builder.gnu.cross.1773050001" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug" />
 								</outputEntries>
@@ -131,7 +131,7 @@
 						<toolChain id="fr.ac6.managedbuild.toolchain.gnu.cross.exe.release.2089477991" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.exe.release">
 							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.205381709" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.24048887" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F103C8Tx" valueType="string" />
-							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1012667088" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="GeometryDash-CE" valueType="string" />
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1012667088" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="ChromeDino-CE" valueType="string" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.core.1083960614" name="Core" superClass="fr.ac6.managedbuild.option.gnu.cross.core" valueType="stringList">
 								<listOptionValue builtIn="false" value="ARM Cortex-M3" />
 								<listOptionValue builtIn="false" value="CM3" />
@@ -140,7 +140,7 @@
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.2034756928" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" value="fr.ac6.managedbuild.option.gnu.cross.fpu.no" valueType="enumerated" />
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.933948874" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.soft" valueType="enumerated" />
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.137394714" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross" />
-							<builder buildPath="${workspace_loc:/GeometryDash-CE}/Release" id="fr.ac6.managedbuild.builder.gnu.cross.1773050001" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross">
+							<builder buildPath="${workspace_loc:/ChromeDino-CE}/Release" id="fr.ac6.managedbuild.builder.gnu.cross.1773050001" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release" />
 								</outputEntries>
@@ -226,7 +226,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="GeometryDash-CE.fr.ac6.managedbuild.target.gnu.cross.exe.1497263969" name="Executable" projectType="fr.ac6.managedbuild.target.gnu.cross.exe" />
+		<project id="ChromeDino-CE.fr.ac6.managedbuild.target.gnu.cross.exe.1497263969" name="Executable" projectType="fr.ac6.managedbuild.target.gnu.cross.exe" />
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="" />
@@ -237,7 +237,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders" />
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration artifactName="${ProjName}" configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="GeometryDash-CE" />
+			<resource resourceType="PROJECT" workspacePath="ChromeDino-CE" />
 		</configuration>
 	</storageModule>
 </cproject>

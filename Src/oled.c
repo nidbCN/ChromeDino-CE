@@ -40,7 +40,6 @@ void OLED_Clear() {
 }
 
 
-
 //开启OLED显示
 void OLED_Display_On(void) {
     OLED_WR_CMD(0X8D);  //SET DCDC命令
@@ -81,7 +80,6 @@ unsigned int oled_pow(uint8_t m, uint8_t n) {
     }
     return result;
 }
-
 
 
 //在指定位置显示一个字符,包括部分字符
@@ -150,18 +148,18 @@ void OLED_ShowString(uint8_t x, uint8_t y, uint8_t *chr, uint8_t Char_Size) {
     }
 }
 
-//显示汉字
-//hzk 用取模软件得出的数组
-void OLED_ShowChinese(uint8_t x, uint8_t y, uint8_t no) {
-    uint8_t t, adder = 0;
-    OLED_Set_Pos(x, y);
-    for (t = 0; t < 16; t++) {
-        OLED_WR_DATA(Hzk[2 * no][t]);
-        adder += 1;
-    }
-    OLED_Set_Pos(x, y + 1);
-    for (t = 0; t < 16; t++) {
-        OLED_WR_DATA(Hzk[2 * no + 1][t]);
-        adder += 1;
-    }
-}
+// //显示汉字
+// //hzk 用取模软件得出的数组
+// void OLED_ShowChinese(uint8_t x, uint8_t y, uint8_t no) {
+//     uint8_t t, adder = 0;
+//     OLED_Set_Pos(x, y);
+//     for (t = 0; t < 16; t++) {
+//         OLED_WR_DATA(Hzk[2 * no][t]);
+//         adder += 1;
+//     }
+//     OLED_Set_Pos(x, y + 1);
+//     for (t = 0; t < 16; t++) {
+//         OLED_WR_DATA(Hzk[2 * no + 1][t]);
+//         adder += 1;
+//     }
+// }

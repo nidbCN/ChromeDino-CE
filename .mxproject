@@ -7,8 +7,8 @@ HeaderPath=..\Drivers\STM32F1xx_HAL_Driver\Inc;..\Drivers\STM32F1xx_HAL_Driver\I
 CDefines=USE_HAL_DRIVER;STM32F103xB;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=D:/Codes/C-Project/GeometryDash-CE/Inc
+HeaderPath=D:/Codes/C-Project/ChromeDino-CE/Inc
 HeaderFiles=gpio.h;i2c.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;
-SourcePath=D:/Codes/C-Project/GeometryDash-CE/Src
+SourcePath=D:/Codes/C-Project/ChromeDino-CE/Src
 SourceFiles=gpio.c;i2c.c;stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;
 
