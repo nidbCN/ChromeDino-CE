@@ -25,7 +25,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
-
 #include "oled.h"
 /* USER CODE END Includes */
 
@@ -149,8 +148,6 @@ int main(void)
 
 
 
-
-sss
 
         {
             for (int i = 0; i < 119; ++i) {

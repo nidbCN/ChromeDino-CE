@@ -13,6 +13,8 @@ set(CMAKE_OBJDUMP arm-none-eabi-objdump)
 set(SIZE arm-none-eabi-size)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # project settings
 project(GeometryDash-CE C CXX ASM)
 set(CMAKE_CXX_STANDARD 17)

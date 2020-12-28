@@ -1,10 +1,21 @@
 //
 // Created by Gaein on 2020/12/27.
-// 游戏文件
+// 游戏操作相关函数
 //
 
 #include "oled.h"
-#include "oledfont.h"
+
+// 宏定义
+#define NULL_DATA (0x00)
+#define FILL_DATA (0xFF)
+#define WIDTH_MAX (128)
+#define HEIGHT_MAX (8)
+
+// 游戏资源大小
+#define RES_SIZE_8x16 (0)
+#define RES_SIZE_16x16 (1)
+#define RES_SIZE_16x32 (2)
+#define RES_SIZE_32x32 (3)
 
 #define RES_NULL_8x16 0
 #define RES_CACTUS_8x16 1
@@ -14,42 +25,66 @@
 #define RES_DINO2_16x16 4
 #define RES_CACTUS_16x16 6
 
-// 游戏8x16图片
-const unsigned char Res8x16[][16] = {
-        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // 0 空
-        {0xF8, 0xF8, 0x00, 0xFF, 0xFF, 0x00, 0xFC, 0xFC, 0x0F, 0x1F, 0x18, 0xFF, 0xFF, 0x03, 0x03, 0x01},   // 1 仙人掌
-};
-
-// 游戏16x16图片
-const unsigned char Res16x16[][16] = {
-        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 空 0x2
-        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 空
-        {0xF8, 0xE0, 0xC0, 0x80, 0x80, 0xC0, 0xF0, 0xF8, 0xFE, 0xFF, 0xFD, 0xFD, 0xDF, 0xDF, 0x5E, 0x1E}, // 恐龙1上 1x2
-        {0x00, 0x01, 0x07, 0x0F, 0x3F, 0x3F, 0x2F, 0x0F, 0x1F, 0xFF, 0xC7, 0x02, 0x0E, 0x00, 0x00, 0x00}, // 恐龙1下
-        {0xF8, 0xE0, 0xC0, 0x80, 0x80, 0xC0, 0xF0, 0xF8, 0xFE, 0xFF, 0xFD, 0xFD, 0xDF, 0xDF, 0x5E, 0x1E}, // 恐龙2上 2x2
-        {0x00, 0x01, 0x07, 0x0F, 0xFF, 0xBF, 0x1F, 0x1F, 0x3F, 0x2F, 0x27, 0x02, 0x0E, 0x00, 0x00, 0x00}, // 恐龙2下
-};
-
-// 显示游戏图标
-void OLED_ShowGame(uint8_t x, uint8_t y, uint8_t chr, uint8_t Char_Size) {
-    if (x > 128 - 1) {
-        x = 0;
-        y += 2;
+void GAME_OLED_FullFill() {
+    for (int i = 0; i < HEIGHT_MAX; ++i) {
+        for (int j = 0; j < WIDTH_MAX; ++j) {
+            OLED_Set_Pos(i, j);
+            OLED_WR_DATA(FILL_DATA);
+        }
     }
-    OLED_Set_Pos(x, y);
-    // 大号字
-    if (Char_Size == CHAR_GAME_SM) {
-        for (int i = 0; i < 8; i++) {
-            OLED_WR_DATA(G8x16[chr * 16 + i]);
+}
+
+// 从坐标(x,y)处向右下清除 width x height*8 个像素
+// 注意超出后不会清除反侧的
+void GAME_OLED_ClearBlockCustom(uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
+    // 防止出界
+    height = y + height > HEIGHT_MAX ? HEIGHT_MAX - y : height;
+    width = x + width > WIDTH_MAX ? WIDTH_MAX - x : x;
+
+    // 清空区域
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            OLED_Set_Pos(x, y);         // 设置光标
+            OLED_WR_DATA(NULL_DATA);    // 写入空数据
         }
-        OLED_Set_Pos(x, y + 1);
-        for (int i = 0; i < 8; i++) {
-            OLED_WR_DATA(G8x16[chr * 16 + i + 8]);
-        }
-        // 小号字
-    } else if (Char_Size == CHAR_GAME_LG) {
-        for (int i = 0; i < 6; i++) {
-            OLED_WR_DATA(F6x8[chr][i]);
-        }
+    }
+}
+
+// 从坐标(x,y)处向右下清除 1 x height*8 个像素
+void GAME_OLED_ClearVertical(uint8_t x, uint8_t y, uint8_t height) {
+    for (int i = 0; i < height; ++i) {
+        OLED_Set_Pos(x, y);
+
+    }
+    GAME_OLED_ClearBlockCustom(x, y, 1, height);
+}
+
+void GAME_OLED_ClearBlock(uint8_t x, uint8_t y, uint8_t type) {
+    uint8_t width = 0;
+    uint8_t height = 0;
+
+    // 通过type设置清除的大小
+    switch (type) {
+        case RES_SIZE_8x16:
+            width = 8;
+            height = 2;
+            break;
+        case RES_SIZE_16x16:
+            width = 16;
+            height = 2;
+            break;
+        case RES_SIZE_16x32:
+            width = 16;
+            height = 4;
+            break;
+        case RES_SIZE_32x32:
+            width = 32;
+            height = 4;
+            break;
+    }
+
+    // 有数据时进行清除
+    if (width&&height) {
+        GAME_OLED_ClearBlockCustom(x, y, width, height);
     }
 }
