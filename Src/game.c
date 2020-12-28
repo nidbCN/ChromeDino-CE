@@ -29,3 +29,27 @@ const unsigned char Res16x16[][16] = {
         {0xF8, 0xE0, 0xC0, 0x80, 0x80, 0xC0, 0xF0, 0xF8, 0xFE, 0xFF, 0xFD, 0xFD, 0xDF, 0xDF, 0x5E, 0x1E}, // 恐龙2上 2x2
         {0x00, 0x01, 0x07, 0x0F, 0xFF, 0xBF, 0x1F, 0x1F, 0x3F, 0x2F, 0x27, 0x02, 0x0E, 0x00, 0x00, 0x00}, // 恐龙2下
 };
+
+// 显示游戏图标
+void OLED_ShowGame(uint8_t x, uint8_t y, uint8_t chr, uint8_t Char_Size) {
+    if (x > 128 - 1) {
+        x = 0;
+        y += 2;
+    }
+    OLED_Set_Pos(x, y);
+    // 大号字
+    if (Char_Size == CHAR_GAME_SM) {
+        for (int i = 0; i < 8; i++) {
+            OLED_WR_DATA(G8x16[chr * 16 + i]);
+        }
+        OLED_Set_Pos(x, y + 1);
+        for (int i = 0; i < 8; i++) {
+            OLED_WR_DATA(G8x16[chr * 16 + i + 8]);
+        }
+        // 小号字
+    } else if (Char_Size == CHAR_GAME_LG) {
+        for (int i = 0; i < 6; i++) {
+            OLED_WR_DATA(F6x8[chr][i]);
+        }
+    }
+}

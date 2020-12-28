@@ -4,20 +4,6 @@
 //几个变量声明
 uint8_t **Hzk;
 
-//初始化命令
-uint8_t CMD_Data[] = {
-        0xAE, 0x00, 0x10, 0x40, 0xB0, 0x81, 0xFF, 0xA1, 0xA6, 0xA8, 0x3F,
-        0xC8, 0xD3, 0x00, 0xD5, 0x80, 0xD8, 0x05, 0xD9, 0xF1, 0xDA, 0x12,
-        0xD8, 0x30, 0x8D, 0x14, 0xAF
-};
-
-void WriteCmd() {
-    uint8_t i = 0;
-    for (i = 0; i < 27; i++) {
-        HAL_I2C_Mem_Write(&hi2c1, 0x78, 0x00, I2C_MEMADD_SIZE_8BIT, CMD_Data + i, 1, 0x100);
-    }
-}
-
 //向设备写控制命令
 void OLED_WR_CMD(uint8_t cmd) {
     HAL_I2C_Mem_Write(&hi2c1, 0x78, 0x00, I2C_MEMADD_SIZE_8BIT, &cmd, 1, 0x100);
@@ -30,8 +16,16 @@ void OLED_WR_DATA(uint8_t data) {
 
 //初始化oled屏幕
 void OLED_Init(void) {
-    HAL_Delay(200);
-    WriteCmd();
+    //初始化命令
+    uint8_t CMD_Data[] = {
+            0xAE, 0x00, 0x10, 0x40, 0xB0, 0x81, 0xFF, 0xA1, 0xA6, 0xA8, 0x3F,
+            0xC8, 0xD3, 0x00, 0xD5, 0x80, 0xD8, 0x05, 0xD9, 0xF1, 0xDA, 0x12,
+            0xD8, 0x30, 0x8D, 0x14, 0xAF
+    };
+
+    for (uint8_t i = 0; i < 27; ++i) {
+        HAL_I2C_Mem_Write(&hi2c1, 0x78, 0x00, I2C_MEMADD_SIZE_8BIT, CMD_Data + i, 1, 0x100);
+    }
 }
 
 //清屏size12 size16要清两行，其他函数有类似情况
@@ -46,22 +40,47 @@ void OLED_Clear() {
     }
 }
 
-void OLED_ClearVertical(uint8_t x, uint8_t y, uint8_t height) {
+// 向右向下清除指定位置x, y width, height x 8大小的方格
+void OLED_ClearBlockCustom(uint8_t x, uint8_t y, uint8_t width, uint8_t, height) {
     OLED_Set_Pos(x, y);
-    for (int i = 0; i < height; ++i) {
-        OLED_Set_Pos(x, y + i);
-        OLED_WR_DATA(0x00);
+
+    // 防止出界
+    height = y + height > 7 ? 8 - y;
+    width = x + width > 127 ? 128 - y;
+
+    // 清空区域
+    for (int i = 0; i < heght; ++i) {
+        for (int j = 0; j < width; ++j) {
+            OLED_Set_Pos(x, y + i);
+            OLED_WR_DATA(0x00);
+        }
     }
 }
 
-//清行
-void OLED_ClearRow(uint8_t i) {
-    uint8_t n;
-    OLED_WR_CMD(0xb0 + i);
-    OLED_WR_CMD(0x00);
-    OLED_WR_CMD(0x10);
-    for (n = 0; n < 128; n++)
-        OLED_WR_DATA(0);
+// 在坐标处向下写 height x 8 个点阵
+void OLED_ClearVertical(uint8_t x, uint8_t y, uint8_t height) {
+    OLED_ClearBlockCustom(x, y, 1, 1);
+}
+
+// 在坐标处向右写 width 个点阵
+void OLED_ClearLine(uint8_t x, uint8_t y, uint8_t width) {
+
+}
+
+// 从坐标处向右下横向清除num个 8 x 8 块
+void OLED_ClearBlock_8x8(uint8_t x, uint8_t y, uint8_t num) {
+    OLED_ClearBlockCustom(x, y, num * 8, 8);
+}
+
+// 从坐标处向右下横向清除num个 8 x 16 块
+void OLED_ClearBlock_8x16(uint8_t x, uint8_t y, uint8_t num) {
+    OLED_ClearBlockCustom(x, y, 8 * num, 2);
+}
+
+// 清空一整行(128 x 16)
+void OLED_ClearRow(uint8_t y) {
+    OLED_ClearBlockCustom(0, ++y, 128, 1);
+    OLED_ClearBlockCustom(0, y, 128, 1);
 }
 
 //开启OLED显示
@@ -78,6 +97,7 @@ void OLED_Display_Off(void) {
     OLED_WR_CMD(0XAE);  //DISPLAY OFF
 }
 
+// 设置光标
 void OLED_Set_Pos(uint8_t x, uint8_t y) {
     OLED_WR_CMD(0xb0 + y);
     OLED_WR_CMD(((x & 0xf0) >> 4) | 0x10);
@@ -95,34 +115,16 @@ void OLED_On(void) {
     } //更新显示
 }
 
+// 乘方运算
 unsigned int oled_pow(uint8_t m, uint8_t n) {
     unsigned int result = 1;
-    while (n--)result *= m;
+    while (n--) {
+        result *= m;
+    }
     return result;
 }
 
-void OLED_ShowGame(uint8_t x, uint8_t y, uint8_t chr, uint8_t Char_Size) {
-    if (x > 128 - 1) {
-        x = 0;
-        y += 2;
-    }
-    OLED_Set_Pos(x, y);
-    // 大号字
-    if (Char_Size == CHAR_GAME_SM) {
-        for (int i = 0; i < 8; i++) {
-            OLED_WR_DATA(G8x16[chr * 16 + i]);
-        }
-        OLED_Set_Pos(x, y + 1);
-        for (int i = 0; i < 8; i++) {
-            OLED_WR_DATA(G8x16[chr * 16 + i + 8]);
-        }
-        // 小号字
-    } else if (Char_Size == CHAR_GAME_LG) {
-        for (int i = 0; i < 6; i++) {
-            OLED_WR_DATA(F6x8[chr][i]);
-        }
-    }
-}
+
 
 //在指定位置显示一个字符,包括部分字符
 //x:0~127
