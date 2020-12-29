@@ -3,11 +3,22 @@
  * By Gaein nidb , https://www.gaein.cn
  * 中北大学 | 大数据学院 2007040115李子康
  */
-#include <stdint.h>
 #ifndef _GRAPHICS_EMBEDDED_
 #define _GRAPHICS_EMBEDDED_
 
 /*------宏定义------*/
+
+/*------函数参数------*/
+
+// 发送类别：指令
+#define OLED_SEND_CMD (0)
+// 发送类别：数据
+#define OLED_SEND_DATA (64)
+
+// 设置显示：关闭
+#define OLED_DISPLAY_OFF (0)
+// 设置显示：开启
+#define OLED_DISPLAY_ON (1)
 
 /*------8x16 资源------*/
 
@@ -70,6 +81,21 @@
 
 /*------函数声明------*/
 
+/*------OLED相关------*/
+
+// OLED 发送数据
+// 注意：type为 OLED_SEND_DATA 或 OLED_SEND_CMD
+void OLED_Send(uint8_t type, uint8_t *data, uint8_t size);
+
+// OLED 设置显示开关
+// 注意：option为 OLED_DISPLAY_ON 或 OLED_DISPLAY_OFF
+void OLED_SetDisplay(bool option);
+
+// OLED设置初始化
+void OLED_SetInit();
+
+// 设置光标位置(x,y)
+void OLED_SetPosition(uint8_t x, uint8_t y);
 /*------填充相关------*/
 
 // 从坐标(x,y)处向右下填充 width x 8 个像素大小的内容 res数组

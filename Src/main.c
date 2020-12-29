@@ -26,7 +26,6 @@
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
 #include "graphicsE.h"
-#include "oled.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,13 +58,8 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void drawDino(uint8_t **input) {
-    OLED_Set_Pos(1, 6);
-    for (int i = 0; i < 16; ++i) {
-        for (int j = 0; j < 2; ++j) {
-            OLED_WR_DATA(input[i][j]);
-        }
-    }
+void flash_LED() {
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 }
 
 /* USER CODE END 0 */
@@ -100,9 +94,8 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-    OLED_Init();
+    OLED_Init();S
     OLED_Clear();
-    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
     // 100像素/�??
     // 跳起0.8
@@ -122,8 +115,14 @@ int main(void)
     gameDino.isJumped = 0;
     gameDino.startTime = 0;
 
-bool t1 = false;
+    bool t1 = false;
 
+    int8_t axis = 127;
+
+    int8_t groundI = 128;
+    int8_t gII = 64;
+
+    uint8_t cntClock = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,19 +132,27 @@ bool t1 = false;
 
     /* USER CODE BEGIN 3 */
 
-        GAME_OLED_FillBlockAny(0,0,RES_SIZE_8x16,RES_ID_8x16_CACTUS_1);
-        GAME_OLED_FillBlockAny(10,3,RES_SIZE_16x32,RES_ID_16x32_CACTUS_4);
-        if (t1)
-        {
-            GAME_OLED_FillBlockAny(50,3,RES_SIZE_16x16, RES_ID_16x16_DINO_2);
-            t1=false;
-        }
-        else
-        {
-            GAME_OLED_FillBlockAny(50,3,RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+    if ((cntClock & 3) == 0) {
+        flash_LED();
+
+        if (t1) {
+            GAME_OLED_FillBlockAny(56, 2, RES_SIZE_16x16, RES_ID_16x16_DINO_2);
+            t1 = false;
+        } else {
+            GAME_OLED_FillBlockAny(56, 2, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
             t1 = true;
         }
-        HAL_Delay(0);
+    }
+
+    if (gII>=-16 && gII < 128) {
+        GAME_OLED_FillBlockAny(gII, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
+        GAME_OLED_ClearBlockCustom(gII + 16, 4, 1, 4);
+    } else{
+        gII = 127;
+    }
+
+    gII--;
+    groundI--;
 
 //        uint8_t gameDinoTempHeight = gameDino.height;
 //        if (gameDino.isJumped) {
@@ -172,6 +179,9 @@ bool t1 = false;
 //            }
 //        }
 
+
+
+    ++cntClock;
 
     }
   /* USER CODE END 3 */
