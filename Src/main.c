@@ -24,13 +24,18 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdbool.h>
+#include <stdint.h>
+#include "util.h"
 #include "graphicsE.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct _dino {
+    uint8_t isJumped;
+    uint32_t startTime;
+    uint8_t height;
+} Dino;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -45,7 +50,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t axis = 0;
+uint16_t score = 14;
 
 /* USER CODE END PV */
 
@@ -57,10 +63,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-void flash_LED() {
-    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-}
 
 /* USER CODE END 0 */
 
@@ -94,34 +96,15 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-    OLED_Init();S
-    OLED_Clear();
-
-    // 100像素/�??
-    // 跳起0.8
-    // 0.4 秒跳48像素
-    // 48 x 2 / 0.16 = g
-    // g = 600 像素2/s
-    // h = 1/2 g t2
-
-    typedef struct _dino {
-        uint8_t isJumped;
-        uint32_t startTime;
-        uint8_t height;
-    } Dino;
+    OLED_SetInit();
+    OLED_SetDisplay(OLED_DISPLAY_ON);
+    OLED_ClearScreen();
 
     Dino gameDino;
-    gameDino.height = 0;
+    gameDino.height = 6;
     gameDino.isJumped = 0;
     gameDino.startTime = 0;
-
-    bool t1 = false;
-
-    int8_t axis = 127;
-
-    int8_t groundI = 128;
-    int8_t gII = 64;
-
+    uint8_t timer = HAL_GetTick();
     uint8_t cntClock = 0;
   /* USER CODE END 2 */
 
@@ -132,57 +115,36 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    if ((cntClock & 3) == 0) {
-        flash_LED();
-
-        if (t1) {
-            GAME_OLED_FillBlockAny(56, 2, RES_SIZE_16x16, RES_ID_16x16_DINO_2);
-            t1 = false;
-        } else {
-            GAME_OLED_FillBlockAny(56, 2, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
-            t1 = true;
+        if ((cntClock & 31) == 0) {
+//            LED_toggle();
         }
-    }
+        OLED_FillBlockAny(0, 6,RES_SIZE_16x16, RES_ID_16x16_DINO_1);
 
-    if (gII>=-16 && gII < 128) {
-        GAME_OLED_FillBlockAny(gII, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
-        GAME_OLED_ClearBlockCustom(gII + 16, 4, 1, 4);
-    } else{
-        gII = 127;
-    }
+        if (gameDino.isJumped) {
+            uint8_t getY = GAME_jump(HAL_GetTick() - gameDino.startTime); // 获取高度坐标
+            // 刷新位置
+            if (gameDino.height != getY) {
+                OLED_FillBlockAny(0, getY,RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+                OLED_ClearBlockAny(0,gameDino.height,RES_SIZE_16x16);
+                gameDino.height = getY;
+                if (getY == 0) {
+                    gameDino.isJumped = 0;
+                }
+            }
+        } else if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET) {
+            LED_toggle();
+            gameDino.startTime = HAL_GetTick();
+            gameDino.isJumped = 1;
+        }
 
-    gII--;
-    groundI--;
-
-//        uint8_t gameDinoTempHeight = gameDino.height;
-//        if (gameDino.isJumped) {
-//            // 计算新的高度
-//            uint32_t time = HAL_GetTick();
-//            gameDino.height = 0.5 * 600 *
-//                              ((HAL_GetTick() - gameDino.startTime) / 1000) *
-//                              ((HAL_GetTick() - gameDino.startTime) / 1000);
-//        } else {
-//            // 起跳
-//            if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET) {
-//                HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-//                gameDino.isJumped = true;
-//                gameDino.height = 0;
-//                gameDino.startTime = HAL_GetTick();
-//            }
-//        }
-//
-//
-//        {
-//            for (int i = 0; i < 128; ++i) {
-//                OLED_ShowGame(119 - i, 6, 2, CHAR_GAME_SM);
-//                OLED_ClearVertical(127 - i, 6, 2);
-//            }
-//        }
+        OLED_FillBlockAny(56, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
 
 
 
-    ++cntClock;
 
+        OLED_FillBlockInt4(96, 0, score);
+        score++;
+        ++cntClock;
     }
   /* USER CODE END 3 */
 }
