@@ -25,17 +25,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdint.h>
+#include <stdbool.h>
 #include "util.h"
 #include "graphicsE.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct _dino {
-    uint8_t isJumped;
-    uint32_t startTime;
-    uint8_t height;
-} Dino;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -96,56 +93,64 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-    OLED_SetInit();
-    OLED_SetDisplay(OLED_DISPLAY_ON);
-    OLED_ClearScreen();
+  // OLED 屏幕初始化
+  OLED_SetInit();
+  OLED_SetDisplay(OLED_DISPLAY_ON);
+  OLED_ClearScreen();
 
-    Dino gameDino;
-    gameDino.height = 6;
-    gameDino.isJumped = 0;
-    gameDino.startTime = 0;
-    uint8_t timer = HAL_GetTick();
-    uint8_t cntClock = 0;
+  // 新建恐龙对象
+  Dino gameDino;
+  gameDino.height = 6;
+  gameDino.isJumped = 0;
+  gameDino.startTime = 0;
+  uint8_t timer = HAL_GetTick();
+  uint8_t cntClock = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    while (1) {
+  while (1)
+  {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-        if ((cntClock & 31) == 0) {
-//            LED_toggle();
-        }
-        OLED_FillBlockAny(0, 6,RES_SIZE_16x16, RES_ID_16x16_DINO_1);
-
-        if (gameDino.isJumped) {
-            uint8_t getY = GAME_jump(HAL_GetTick() - gameDino.startTime); // 获取高度坐标
-            // 刷新位置
-            if (gameDino.height != getY) {
-                OLED_FillBlockAny(0, getY,RES_SIZE_16x16, RES_ID_16x16_DINO_1);
-                OLED_ClearBlockAny(0,gameDino.height,RES_SIZE_16x16);
-                gameDino.height = getY;
-                if (getY == 0) {
-                    gameDino.isJumped = 0;
-                }
-            }
-        } else if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET) {
-            LED_toggle();
-            gameDino.startTime = HAL_GetTick();
-            gameDino.isJumped = 1;
-        }
-
-        OLED_FillBlockAny(56, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
-
-
-
-
-        OLED_FillBlockInt4(96, 0, score);
-        score++;
-        ++cntClock;
+    if ((cntClock & 31) == 0)
+    {
+      LED_toggle();
     }
+    OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+
+    // 已经起跳
+    if (gameDino.isJumped)
+    {
+      uint8_t getY = GAME_jump(HAL_GetTick() - gameDino.startTime); // 获取高度坐标
+      // 刷新位置
+      if (gameDino.height != getY)
+      {
+        OLED_FillBlockAny(0, getY, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+        OLED_ClearBlockAny(0, gameDino.height, RES_SIZE_16x16);
+        gameDino.height = getY;
+        // 落地
+        if (getY == 0)
+        {
+          gameDino.isJumped = false;
+        }
+      }
+    }
+    else if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET)
+    {
+      LED_toggle();
+      gameDino.startTime = HAL_GetTick();
+      gameDino.isJumped = 1;
+    }
+
+    OLED_FillBlockAny(56, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
+
+    OLED_FillBlockInt4(96, 0, score);
+    score++;
+    ++cntClock;
+  }
   /* USER CODE END 3 */
 }
 
@@ -174,8 +179,7 @@ void SystemClock_Config(void)
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -198,16 +202,15 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-    while (1) {
-
-
-    }
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
