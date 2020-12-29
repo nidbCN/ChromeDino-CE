@@ -9,6 +9,57 @@
 
 /*------宏定义------*/
 
+/*------8x16 资源------*/
+
+// 8x16 小仙人掌1
+#define RES_ID_8x16_CACTUS_1 (0)
+// 8x16 小仙人掌2
+#define RES_ID_8x16_CACTUS_2 (2)
+// 8x16 小仙人掌3
+#define RES_ID_8x16_CACTUS_3 (4)
+// 8x16 小仙人掌4
+#define RES_ID_8x16_CACTUS_4 (6)
+// 8x16 字体索引表
+#define RES_ID_8x16_NUM(n) (n*2)
+
+/*------16x16 资源------*/
+
+// 16x16 恐龙1
+#define RES_ID_16x16_DINO_1 (0)
+// 16x16 恐龙2
+#define RES_ID_16x16_DINO_2 (2)
+// 16x16 恐龙静态
+#define RES_ID_16x16_DINO_3 (4)
+
+/*------16x32 资源------*/
+
+// 16x32 大仙人掌1
+#define RES_ID_16x32_CACTUS_1 (0)
+// 16x32 大仙人掌2
+#define RES_ID_16x32_CACTUS_2 (4)
+// 16x32 大仙人掌3
+#define RES_ID_16x32_CACTUS_3 (8)
+// 16x32 大仙人掌4
+#define RES_ID_16x32_CACTUS_4 (12)
+
+/*------16x32 资源------*/
+
+// 32x32 重新开始
+#define RES_ID_32x32_RESTART (0)
+
+/*------64x32资源------*/
+
+// 64x32 GAME字符串
+#define RES_ID_64x32_GAME (0)
+// 64x32 OVER字符串
+#define RES_ID_64x32_OVER (4)
+
+/*------64x64 资源------*/
+
+// 64x64 4FC7838F-A9F9-4D3A-8643-FC23406DF6E9
+
+#define RES_ID_64x64_4FC7838FA9F94D3A8643FC23406DF6E9 (0)
+
 // 代表游戏资源大小
 #define RES_SIZE_8x16 (0)
 #define RES_SIZE_16x16 (1)

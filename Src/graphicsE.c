@@ -26,7 +26,7 @@ void GAME_OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res)
     // 防止出界
     if (y < HEIGHT_MAX)
     {
-        width = x + width > WIDTH_MAX ? WIDTH_MAX - x : x;
+        width = x + width > WIDTH_MAX ? WIDTH_MAX - x : width;
         OLED_Set_Pos(x, y); // 设置光标
         while (i < width)   // 渲染置顶宽度的数据
         {
@@ -49,7 +49,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 2;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G8x16[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_P8x16[res + i]);
         }
         break;
     case RES_SIZE_16x16:
@@ -57,7 +57,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 2;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G16x16[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_P16x16[res + i]);
         }
         break;
     case RES_SIZE_16x32:
@@ -65,7 +65,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 4;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G16x32[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_P16x32[res + i]);
         }
         break;
     case RES_SIZE_32x32:
@@ -73,7 +73,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 4;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G32x32[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_P32x32[res + i]);
         }
         break;
     case RES_SIZE_64x32:
@@ -81,7 +81,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 4;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G64x32[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_S64x32[res + i]);
         }
         break;
     case RES_SIZE_64x64:
@@ -89,7 +89,7 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
         height = 8;
         for (uint8_t i = 0; i < height; ++i)
         {
-            GAME_OLED_FillBlockRow(x, y + i, width, RES_G64x64[res + i]);
+            GAME_OLED_FillBlockRow(x, y + i, width, RES_P64x64[res + i]);
         }
         break;
     }
@@ -99,11 +99,11 @@ void GAME_OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res)
 void GAME_OLED_FillBlockInt4(int8_t x, uint8_t y, uint16_t num)
 {
     // 乘方表
-    uint8_t powTable[4] = {1000, 100, 10, 1};
+    uint16_t powTable[4] = {1000, 100, 10, 1};
     // 循环设置数字字符
     for (int i = 0; i < 4; i++)
     {
-        uint8_t ch = RES_ID_8x16_NUM[num / powTable[i]]; // 获取数字对于的表ID
+        uint8_t ch = RES_ID_8x16_NUM(num / powTable[i]); // 获取数字对于的表ID
         GAME_OLED_FillBlockChar(x + i * 8, y, ch);       // 显示数字
         num %= powTable[i];
     }
@@ -147,7 +147,7 @@ void GAME_OLED_ClearBlockRow(uint8_t x, uint8_t y, uint8_t width)
 {
     if (y < HEIGHT_MAX)
     {
-        width = x + width > WIDTH_MAX ? WIDTH_MAX - x : x;
+        width = x + width > WIDTH_MAX ? WIDTH_MAX - x : width;
         OLED_Set_Pos(x, y);
         uint8_t count = width * 8;
         for (uint8_t i = 0; i < count; i++)
