@@ -127,6 +127,7 @@ void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
             width = 64;
             height = 8;
             for (uint8_t i = 0; i < height; ++i) {
+
                 OLED_FillBlockRow(x, y + i, width, RES_P64x64[res + i]);
             }
             break;

@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "util.h"
 #include "graphicsE.h"
@@ -47,8 +48,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t axis = 0;
-uint16_t score = 14;
+//uint8_t axis = 0;
+//uint16_t score = 14;
 
 /* USER CODE END PV */
 
@@ -67,128 +68,146 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
+int main(void) {
+    /* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+    /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+    /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+    HAL_Init();
 
-  /* USER CODE BEGIN Init */
+    /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+    /* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+    /* Configure the system clock */
+    SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+    /* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+    /* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_I2C1_Init();
-  /* USER CODE BEGIN 2 */
-  // OLED 屏幕初始化
-  OLED_SetInit();
-  OLED_SetDisplay(OLED_DISPLAY_ON);
-  OLED_ClearScreen();
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    MX_I2C1_Init();
+    /* USER CODE BEGIN 2 */
+    // OLED 屏幕初始�?
+    OLED_SetInit();
+    OLED_SetDisplay(OLED_DISPLAY_ON);
+    OLED_ClearScreen();
 
-  // 新建恐龙对象
-  Dino gameDino;
-  gameDino.height = 6;
-  gameDino.isJumped = 0;
-  gameDino.startTime = 0;
-  uint8_t timer = HAL_GetTick();
-  uint8_t cntClock = 0;
-  /* USER CODE END 2 */
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+    // 新建恐龙对象
+    Dino *gameDino = (Dino *) malloc(sizeof(Dino));
+    gameDino->isJumped = false;
+    gameDino->jumpTime = 0;
+    gameDino->flag = RES_ID_16x16_DINO_1;
+    gameDino->y = 6;
+    uint8_t timer = HAL_GetTick();
+    uint8_t cntClock = 0;
 
-    /* USER CODE BEGIN 3 */
 
-    if ((cntClock & 31) == 0)
-    {
-      LED_toggle();
-    }
-    OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+    uint8_t btnHasPressed = false;
+    /* USER CODE END 2 */
 
-    // 已经起跳
-    if (gameDino.isJumped)
-    {
-      uint8_t getY = GAME_jump(HAL_GetTick() - gameDino.startTime); // 获取高度坐标
-      // 刷新位置
-      if (gameDino.height != getY)
-      {
-        OLED_FillBlockAny(0, getY, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
-        OLED_ClearBlockAny(0, gameDino.height, RES_SIZE_16x16);
-        gameDino.height = getY;
-        // 落地
-        if (getY == 0)
-        {
-          gameDino.isJumped = false;
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1) {
+        /* USER CODE END WHILE */
+
+        /* USER CODE BEGIN 3 */
+
+        if ((cntClock & 15) == 0) {
+//            LED_toggle();
         }
-      }
-    }
-    else if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET)
-    {
-      LED_toggle();
-      gameDino.startTime = HAL_GetTick();
-      gameDino.isJumped = 1;
-    }
 
-    OLED_FillBlockAny(56, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
+        if (HAL_GPIO_ReadPin(BTN_R_GPIO_Port, BTN_R_Pin) == GPIO_PIN_SET) {
+            btnHasPressed = true;
+            GAME_setDinoJump(gameDino);
+            HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        } else {
+            btnHasPressed = false;
+            HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+        }
 
-    OLED_FillBlockInt4(96, 0, score);
-    score++;
-    ++cntClock;
-  }
-  /* USER CODE END 3 */
+
+        OLED_FillBlockAny(0, 0, RES_SIZE_8x16, RES_ID_8x16_CACTUS_1);
+
+
+        gameDino = GAME_drawDino(gameDino);
+
+
+
+
+//    // 已经起跳
+//    if (gameDino.isJumped)
+//    {
+//      uint8_t getY = GAME_jump(HAL_GetTick() - gameDino.startTime); // 获取高度坐标
+//      // 刷新位置
+//      if (gameDino.height != getY)
+//      {
+//        OLED_FillBlockAny(0, getY, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+//        OLED_ClearBlockAny(0, gameDino.height, RES_SIZE_16x16);
+//        gameDino.height = getY;
+//        // 落地
+//        if (getY == 0)
+//        {
+//          gameDino.isJumped = false;
+//        }
+//      }
+//    }
+//    else if (HAL_GPIO_ReadPin(SWITCH_GPIO_Port, SWITCH_Pin) == GPIO_PIN_RESET)
+//    {
+//      LED_toggle();
+//      gameDino.startTime = HAL_GetTick();
+//      gameDino.isJumped = 1;
+//    }
+//
+//    OLED_FillBlockAny(56, 4, RES_SIZE_16x32, RES_ID_16x32_CACTUS_4);
+//
+//    OLED_FillBlockInt4(96, 0, score);
+//    score++;
+        cntClock++;
+    }
+    /* USER CODE END 3 */
 }
 
 /**
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+void SystemClock_Config(void) {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    /** Initializes the RCC Oscillators according to the specified parameters
+    * in the RCC_OscInitTypeDef structure.
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        Error_Handler();
+    }
+    /** Initializes the CPU, AHB and APB buses clocks
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+        Error_Handler();
+    }
 }
 
 /* USER CODE BEGIN 4 */
@@ -199,18 +218,16 @@ void SystemClock_Config(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
+void Error_Handler(void) {
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+    while (1) {
+    }
+    /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

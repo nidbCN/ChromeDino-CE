@@ -62,6 +62,10 @@ void Error_Handler(void);
 #define VCC_GPIO_Port GPIOC
 #define LED_Pin GPIO_PIN_12
 #define LED_GPIO_Port GPIOB
+#define BTN_R_Pin GPIO_PIN_4
+#define BTN_R_GPIO_Port GPIOB
+#define BTN_L_Pin GPIO_PIN_5
+#define BTN_L_GPIO_Port GPIOB
 #define SWITCH_Pin GPIO_PIN_8
 #define SWITCH_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
