@@ -45,7 +45,7 @@ Dino *GAME_getDinoHeight(Dino *gameDino) {
 
 // get the picture of dino
 Dino *GAME_getDinoFlag(Dino *gameDino) {
-    if ((HAL_GetTick() & 127) == 0) {
+    if ((HAL_GetTick() & 15) == 0) {
         if (gameDino->flag == RES_ID_16x16_DINO_1) {
             gameDino->flag = RES_ID_16x16_DINO_2;
         } else if (gameDino->flag == RES_ID_16x16_DINO_2) {
@@ -84,12 +84,11 @@ Dino *GAME_drawDino(Dino *gameDino) {
 }
 
 // random make a cactus return new cactus or NULL
-Cactus *GAME_getCactusRand(uint8_t randSeed) {
+Cactus *GAME_getCactusRand() {
     // 小于10为8x16，大于10为16x32
     int32_t table[8] = {0, 2, 4, 6, 0, 4, 8, 12};
-    uint8_t seed = (HAL_GetTick() << randSeed);
-    srand(seed);
-    uint8_t randNum = rand() & 4095;
+    srand(HAL_GetTick());
+    uint8_t randNum = rand() & 7;
     Cactus *ret = NULL;
     if (randNum < 8) {
         ret = (Cactus *) malloc(sizeof(Cactus));
@@ -116,6 +115,10 @@ Cactus *GAME_drawCactus(Cactus *gameCactus) {
         }
     }
 
+    if (gameCactus->size == RES_SIZE_8x16) {
+        HAL_Delay(5);
+    }
+
     --(gameCactus->x);
     if (gameCactus->x < -gameCactus->width) {
         free(gameCactus);
@@ -128,7 +131,7 @@ Cactus *GAME_drawCactus(Cactus *gameCactus) {
 bool GAME_getGameStatus(Dino *gameDino, Cactus *gameCactus) {
     bool ret = true;
     if (gameCactus->x <= 16 && gameCactus != NULL) {
-        if ((gameDino->y + 2) >= (8 - gameCactus->height))
+        if ((gameDino->y + 2) > (8 - gameCactus->height))
             ret = false;
     }
     return ret;

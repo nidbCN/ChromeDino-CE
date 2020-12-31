@@ -86,7 +86,6 @@ int main(void) {
     SystemClock_Config();
 
     /* USER CODE BEGIN SysInit */
-
     /* USER CODE END SysInit */
 
     /* Initialize all configured peripherals */
@@ -94,96 +93,86 @@ int main(void) {
     MX_I2C1_Init();
     /* USER CODE BEGIN 2 */
 
-    // OLED init
-    OLED_SetInit();
-    OLED_SetDisplay(OLED_DISPLAY_ON);
+    // OLED codes must behind the I2C Init function
+    OLED_SetInit();                     // Init OLED
+    OLED_SetDisplay(OLED_DISPLAY_ON);   // Set OLED display to ON
+    OLED_ClearScreen();                 // Clear OLED screen
 
 
-    // define a var to record last rand number in order to used as seed next time
-    uint8_t randSeed = rand() % 10;
+    // New a cactus object
+    Cactus *gameCactus = GAME_getCactusRand();
 
-    // new a game cactus object
+    // New a game dino object
+    Dino *gameDino = (Dino *) malloc(sizeof(Dino));
+    // Init the game dino object
+    gameDino->isJumped = false;
+    gameDino->jumpTime = 0;
+    gameDino->flag = RES_ID_16x16_DINO_1;
+    gameDino->y = 6;
 
+    uint16_t score = 0;             // A var to record game scores
+    uint64_t timer = HAL_GetTick(); // A var to record last loop end time
 
-
-    uint8_t timer = HAL_GetTick();
-    uint8_t cntClock = 0;
-
-
-    // define a bool to record if button has pressed down
-    uint8_t btnHasPressed = false;
+    uint8_t btnHasPressed = false;  // define a bool to record if button has pressed down
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (true) {
+        /* USER CODE END WHILE */
 
-        OLED_ClearScreen();
+        /* USER CODE BEGIN 3 */
 
-
-        Cactus *gameCactus = NULL;
-
-        // new a game dino object
-        Dino *gameDino = (Dino *) malloc(sizeof(Dino));
-        gameDino->isJumped = false;
-        gameDino->jumpTime = 0;
-        gameDino->flag = RES_ID_16x16_DINO_1;
-        gameDino->y = 6;
-
-        while (true) {
-            /* USER CODE END WHILE */
-
-            /* USER CODE BEGIN 3 */
-
-
-
-
-
-            // button pressed
-            if (HAL_GPIO_ReadPin(BTN_R_GPIO_Port, BTN_R_Pin) == GPIO_PIN_SET) {
-                btnHasPressed = true;
-                // set game dino status to jumped
-                GAME_setDinoJump(gameDino);
-                HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-            } else {
-                btnHasPressed = false;
-                HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-            }
-
-            if (gameCactus != NULL) {
-                gameCactus = GAME_drawCactus(gameCactus);
-            } else {
-                // try to rand a cactus
-                gameCactus = GAME_getCactusRand(randSeed);
-                if (gameCactus != NULL) {
-                    randSeed = (gameCactus->flag) / 2;
-                }
-            }
-
-            gameDino = GAME_drawDino(gameDino);
-
-            uint8_t nowTime = HAL_GetTick();
-            if ((nowTime - timer) < 30) {
-                HAL_Delay(30 - (nowTime - timer));
-            }
-
-            if (GAME_getGameStatus(gameDino, gameCactus) == false) {
-                OLED_ClearScreen();
-                while (HAL_GPIO_ReadPin(BTN_L_GPIO_Port, BTN_L_Pin) != GPIO_PIN_SET) {
-                    OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
-                    OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
-                    OLED_FillBlockAny(16, 4, RES_SIZE_32x32, RES_ID_32x32_RESTART);
-                    OLED_FillBlockAny(90,1,RES_SIZE_16x16,RES_ID_16x16_DINO_2);
-                    LED_toggle();
-                    HAL_Delay(100);
-                }
-
-                gameCactus = NULL;
-                gameDino = NULL;
-                OLED_ClearScreen();
-            }
-            cntClock++;
+        // button jump pressed
+        if (HAL_GPIO_ReadPin(BTN_R_GPIO_Port, BTN_R_Pin) == GPIO_PIN_SET) {
+            btnHasPressed = true;
+            // set game dino status to jumped
+            GAME_setDinoJump(gameDino);
+            // set LED light
+            HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        } else {
+            btnHasPressed = false;
+            HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
         }
+
+        if (gameCactus != NULL) {
+            gameCactus = GAME_drawCactus(gameCactus);
+            if (gameCactus == NULL) {
+                ++score;
+                OLED_FillBlockInt4(96, 0, score);
+            }
+        } else {
+            uint64_t nowTime = HAL_GetTick();
+            if (nowTime - timer > 1000) {
+                // try to rand a cactus
+                gameCactus = GAME_getCactusRand();
+                timer = nowTime;
+            }
+        }
+
+        gameDino = GAME_drawDino(gameDino);
+
+
+        uint8_t nowTime = HAL_GetTick();
+//        if ((nowTime - timer) < 30) {
+//            HAL_Delay(30 - (nowTime - timer));
+//        }
+
+        if (GAME_getGameStatus(gameDino, gameCactus) == false) {
+            OLED_ClearScreen();
+            while (HAL_GPIO_ReadPin(BTN_L_GPIO_Port, BTN_L_Pin) != GPIO_PIN_SET) {
+                OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
+                OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
+                OLED_FillBlockAny(16, 4, RES_SIZE_32x32, RES_ID_32x32_RESTART);
+                OLED_FillBlockAny(90, 1, RES_SIZE_16x16, RES_ID_16x16_DINO_2);
+                LED_toggle();
+                HAL_Delay(100);
+            }
+            __set_FAULTMASK(1);//关闭总中断
+            NVIC_SystemReset();//请求单片机重启
+
+        }
+
     }
 
     /* USER CODE END 3 */

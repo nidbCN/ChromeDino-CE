@@ -31,7 +31,7 @@ Dino *GAME_drawDino(Dino *gameDino);
 
 Dino *GAME_setDinoJump(Dino *gameDino);
 
-Cactus *GAME_getCactusRand(uint8_t randSeed);
+Cactus *GAME_getCactusRand();
 
 Cactus *GAME_drawCactus(Cactus *gameCactus);
 
