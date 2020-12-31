@@ -86,7 +86,8 @@ Dino *GAME_drawDino(Dino *gameDino) {
 // random make a cactus return new cactus or NULL
 Cactus *GAME_getCactusRand() {
     // 小于10为8x16，大于10为16x32
-    int32_t table[8] = {0, 2, 4, 6, 0, 4, 8, 12};
+    // resource id table
+    int8_t table[8] = {0, 2, 4, 6, 0, 4, 8, 12};
     srand(HAL_GetTick());
     uint8_t randNum = rand() & 7;
     Cactus *ret = NULL;

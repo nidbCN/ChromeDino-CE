@@ -5,6 +5,7 @@
 #define FLAG_DINO_STATUS_RIGHT 1
 #define FLAG_DINO_STATUS_STOP 2
 
+// dino object struct
 typedef struct _dino {
     bool isJumped;
     uint64_t jumpTime;
@@ -12,6 +13,7 @@ typedef struct _dino {
     uint8_t y;
 } Dino;
 
+// cactus object struct
 typedef struct _cactus {
     uint8_t width;
     uint8_t height;

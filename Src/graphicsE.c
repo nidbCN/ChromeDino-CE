@@ -31,7 +31,9 @@ void OLED_Send(uint8_t type, uint8_t *data, uint8_t size) {
 // OLED 设置显示开关
 // 注意：option为 OLED_DISPLAY_ON 或 OLED_DISPLAY_OFF
 void OLED_SetDisplay(uint8_t option) {
+    // command on of oled screen
     uint8_t CMD_DataOn[3] = {0X8D, 0X14, 0XAF};
+    // command off of oled screen
     uint8_t CMD_DataOff[3] = {0X8D, 0X10, 0XAE};
     uint8_t *CMD_Data = option ? CMD_DataOn : CMD_DataOff;
     OLED_Send(OLED_SEND_CMD, CMD_Data, 3);
@@ -39,6 +41,7 @@ void OLED_SetDisplay(uint8_t option) {
 
 // OLED设置初始化
 void OLED_SetInit() {
+    // command init of oled screen
     uint8_t CMD_Data[] = {
             0xAE, 0x00, 0x10, 0x40, 0xB0, 0x81, 0xFF, 0xA1,
             0xA6, 0xA8, 0x3F, 0xC8, 0xD3, 0x00, 0xD5, 0x80,
@@ -51,6 +54,7 @@ void OLED_SetInit() {
 
 // 设置光标位置(x,y)
 void OLED_SetPosition(uint8_t x, uint8_t y) {
+    // command set draw position of oled screen.x and y is position of screen.
     uint8_t CMD_Data[3] = {
             (0xb0 + y),
             (((x & 0xf0) >> 4) | 0x10),
