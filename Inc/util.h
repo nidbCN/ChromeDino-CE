@@ -12,6 +12,15 @@ typedef struct _dino {
     uint8_t y;
 } Dino;
 
+typedef struct _cactus {
+    uint8_t width;
+    uint8_t height;
+    uint8_t size;
+    uint8_t flag;
+    int8_t x;
+    uint8_t y;
+} Cactus;
+
 void LED_toggle();
 
 Dino *GAME_getDinoHeight(Dino *gameDino);
@@ -22,4 +31,8 @@ Dino *GAME_drawDino(Dino *gameDino);
 
 Dino *GAME_setDinoJump(Dino *gameDino);
 
-uint8_t GAME_getRandCactus(uint8_t randSeed);
+Cactus *GAME_getCactusRand(uint8_t randSeed);
+
+Cactus *GAME_drawCactus(Cactus *gameCactus);
+
+bool GAME_getGameStatus(Dino *gameDino, Cactus *gameCactus);
