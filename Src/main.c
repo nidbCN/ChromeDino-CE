@@ -104,6 +104,7 @@ int main(void) {
 
     // New a game dino object
     Dino *gameDino = (Dino *) malloc(sizeof(Dino));
+
     // Init the game dino object
     gameDino->isJumped = false;
     gameDino->jumpTime = 0;
