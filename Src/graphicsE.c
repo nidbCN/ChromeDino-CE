@@ -71,9 +71,11 @@ void OLED_SetPosition(uint8_t x, uint8_t y) {
 // 注意：x为负数只渲染正数部分
 void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     uint8_t i = 0;
+    uint8_t *renderRes = res;
     // 跳过渲染x<0的部分
     if (x < 0) {
         i = -x;
+        renderRes += i;
         x = 0;
     }
 
@@ -81,7 +83,7 @@ void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     if (y < HEIGHT_MAX) {
         width = x + width > WIDTH_MAX ? WIDTH_MAX - x : width;
         OLED_SetPosition(x, y); // 设置光标
-        OLED_Send(OLED_SEND_DATA, res, width - i);
+        OLED_Send(OLED_SEND_DATA, renderRes, width - i);
 
     }
 }
@@ -161,8 +163,12 @@ void OLED_FillBlockChar(int8_t x, uint8_t y, uint8_t ch) {
 
 // 填充整块屏幕
 void OLED_FillScreen() {
-    uint8_t NULL_Data[WIDTH_MAX] = {NULL_DATA};
-    OLED_FillBlockRow(0, 0, WIDTH_MAX, NULL_Data);
+    uint8_t NULL_Data[WIDTH_MAX];
+    memset(NULL_Data, FILL_DATA, WIDTH_MAX);
+    for (int i = 0; i < HEIGHT_MAX; ++i) {
+        OLED_FillBlockRow(0, i, WIDTH_MAX, NULL_Data);
+    }
+
 }
 
 /*------清除相关------*/

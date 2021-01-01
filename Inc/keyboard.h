@@ -3,12 +3,12 @@
 
 #include "universal.h"
 
-bool KB_getJumpBtnStatus();
+bool KB_GetJumpBtnStatus();
 
-bool KB_getRestartBtnStatus();
+bool KB_GetRestartBtnStatus();
 
-void KB_waitJumpBtnHit(uint8_t flushTime);
+void KB_WaitJumpBtnHit(uint8_t flushTime);
 
-void KB_waitRestartBtnHit(uint8_t flushTime);
+void KB_WaitRestartBtnHit(uint8_t flushTime);
 
 #endif

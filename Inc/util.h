@@ -28,27 +28,29 @@ typedef struct _cactus {
 // convert LED to another status
 void LED_toggle();
 
-void GAME_initScreen();
+void GAME_InitScreen();
 
-void GAME_drawGameOver();
+Dino *GAME_InitDino();
+
+void GAME_DrawGameOver();
 
 // get dino height by object pointer game dino
-Dino *GAME_getDinoHeight(Dino *gameDino);
+Dino *GAME_GetDinoHeight(Dino *gameDino);
 
-Dino *GAME_setDinoNotJump(Dino* gameDino);
+Dino *GAME_SetDinoNotJump(Dino* gameDino);
 
 // get dino flag by object pointer game dino
-Dino *GAME_getDinoFlag(Dino *gameDino);
+Dino *GAME_GetDinoFlag(Dino *gameDino);
 
-bool GAME_getDinoShouldDraw(Dino *gameDino);
+bool GAME_GetDinoShouldDraw(Dino *gameDino);
 
 // draw a dino by object pointer dino
-Dino *GAME_drawDino(Dino *gameDino);
+Dino *GAME_DrawDino(Dino *gameDino);
 
-Dino *GAME_setDinoJump(Dino *gameDino);
+Dino *GAME_SetDinoJump(Dino *gameDino);
 
-Cactus *GAME_getCactusRand();
+Cactus *GAME_GetCactusRand();
 
-Cactus *GAME_drawCactus(Cactus *gameCactus);
+Cactus *GAME_DrawCactus(Cactus *gameCactus);
 
-bool GAME_getGameStatus(Dino *gameDino, Cactus *gameCactus);
+bool GAME_GetGameStatus(Dino *gameDino, Cactus *gameCactus);
