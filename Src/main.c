@@ -114,6 +114,10 @@ int main(void) {
     uint32_t timer = HAL_GetTick(); // A var to record last loop end time
     uint16_t interval = GAME_GetRandomNumber_uint16(500, 1000);
 
+    OLED_ClearScreen();
+    GAME_CountDown();
+
+
     GAME_InitScreen();
     OLED_FillBlockInt4(96, 0, 0);
     uint8_t btnHasPressed = false;  // define a bool to record if button has pressed down
@@ -162,6 +166,12 @@ int main(void) {
 
         // Game over
         if (GAME_GetGameStatus(gameDino, gameCactus) == false) {
+//            OLED_ClearBlockAny(0, 6, RES_SIZE_16x16);
+//            OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_4);
+            gameDino->flag = RES_ID_16x16_DINO_4;
+            GAME_DrawDino(gameDino);
+
+            HAL_Delay(600);
             OLED_ClearScreen();         // Clear screen
             GAME_DrawGameOver();        // Draw game over interface
 

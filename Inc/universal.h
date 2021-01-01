@@ -61,13 +61,20 @@
 // 64x32 OVER字符串
 #define RES_ID_64x32_OVER (4)
 
+/* 32x64 */
+#define RES_ID_32x64_0 (0)
+#define RES_ID_32x64_1 (8)
+#define RES_ID_32x64_2 (16)
+#define RES_ID_32x64_3 (24)
+
 // 代表游戏资源大小
 #define RES_SIZE_8x16 (0)
 #define RES_SIZE_16x16 (1)
 #define RES_SIZE_16x32 (2)
 #define RES_SIZE_32x32 (3)
-#define RES_SIZE_64x32 (4)
-#define RES_SIZE_64x64 (5)
+#define RES_SIZE_32x64 (4)
+#define RES_SIZE_64x32 (5)
+#define RES_SIZE_64x64 (6)
 
 // system lib include
 #include <stdio.h>

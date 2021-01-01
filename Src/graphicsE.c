@@ -122,6 +122,14 @@ void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
                 OLED_FillBlockRow(x, y + i, width, RES_P32x32[res + i]);
             }
             break;
+        case RES_SIZE_32x64:
+            width = 32;
+            height = 8;
+            for (uint8_t i = 0; i < height; ++i) {
+                OLED_FillBlockRow(x, y + i, width, RES_F32x64[res + i]);
+            }
+            break;
+
         case RES_SIZE_64x32:
             width = 64;
             height = 4;
@@ -133,7 +141,6 @@ void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
             width = 64;
             height = 8;
             for (uint8_t i = 0; i < height; ++i) {
-
                 OLED_FillBlockRow(x, y + i, width, RES_P64x64[res + i]);
             }
             break;

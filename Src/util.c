@@ -1,20 +1,32 @@
+/*
+ * Some game util functions
+ * Created by Gaein nidb, https://www.gaein.cn
+ * North Universal Of China
+ */
+
 #include "universal.h"
 #include "util.h"
 #include "graphicsE.h"
-#include "gpio.h"
 #include "random.h"
 
-// LED 变换状态
-void LED_toggle() {
-    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-}
-
+/*
+ * Init the OLED screen for game
+ * argument: /
+ * return: void
+ */
 void GAME_InitScreen() {
     OLED_ClearScreen();                 // Clear OLED screen
     OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+    return;
 }
 
+/*
+ * Init a new dino
+ * argument: /
+ * return: Dino* (a new malloced dino)
+ */
 Dino *GAME_InitDino() {
+    // Malloc a new dino
     Dino *gameDino = (Dino *) malloc(sizeof(Dino));
 
     // Init the game dino object
@@ -27,6 +39,31 @@ Dino *GAME_InitDino() {
     return gameDino;
 }
 
+void GAME_CountDown() {
+    const uint8_t x = 48;
+    const uint8_t y = 0;
+    OLED_FillBlockAny(x, y, RES_SIZE_32x64, RES_ID_32x64_3);
+    uint32_t startTime = HAL_GetTick();
+    while (true) {
+        HAL_Delay(1000);
+        uint32_t time = HAL_GetTick() - startTime;
+        if (time > 3000) {
+            OLED_FillBlockAny(x, y, RES_SIZE_32x64, RES_ID_32x64_0);
+            HAL_Delay(1000);
+            break;
+        } else if (time > 2000) {
+            OLED_FillBlockAny(x, y, RES_SIZE_32x64, RES_ID_32x64_1);
+        } else if (time > 1000) {
+            OLED_FillBlockAny(x, y, RES_SIZE_32x64, RES_ID_32x64_2);
+        }
+    }
+}
+
+/*
+ * Draw the game over interface
+ * argument: /
+ * return: void
+ */
 void GAME_DrawGameOver() {
     OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
     OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
@@ -35,7 +72,11 @@ void GAME_DrawGameOver() {
     return;
 }
 
-// set dino status to jumped
+/*
+ * Set dino status to jumped
+ * argument: Dino* (input dino pointer)
+ * return: Dino* (a dino has inited)
+ */
 Dino *GAME_SetDinoJump(Dino *gameDino) {
     if (gameDino->isJumped == false) {
         gameDino->isJumped = true;
@@ -45,6 +86,11 @@ Dino *GAME_SetDinoJump(Dino *gameDino) {
     return gameDino;
 }
 
+/*
+ * Set dino status to not jumped
+ * argument: Dino* (input dino pointer)
+ * return: Dino* (a dino has set to not jump)
+ */
 Dino *GAME_SetDinoNotJump(Dino *gameDino) {
     if (gameDino->isJumped == true) {
         gameDino->isJumped = false;
@@ -54,10 +100,15 @@ Dino *GAME_SetDinoNotJump(Dino *gameDino) {
     return gameDino;
 }
 
-// get the height of jumped dino
+/*
+ * Get the height of jumped dino
+ * argument: Dino* (input dino pointer)
+ * return: Dino* (a dino has set to not jump)
+ */
 Dino *GAME_GetDinoHeight(Dino *gameDino) {
     if (gameDino->isJumped) {
-        uint32_t time = HAL_GetTick() - gameDino->jumpTime;
+        uint32_t time = HAL_GetTick() - gameDino->jumpTime; // Get jumped time
+        // Get time by y
         if ((time > 50 && time <= 100) || (time > 1100 && time <= 1150)) {
             gameDino->y = 5;
         } else if ((time > 100 && time <= 175) || (time > 1025 && time <= 1100)) {
@@ -69,8 +120,9 @@ Dino *GAME_GetDinoHeight(Dino *gameDino) {
         } else if ((time > 425 && time <= 600) || (time > 600 && time <= 775)) {
             gameDino->y = 1;
         } else if (time > 1150) {
+            // End jump
             if (gameDino->y == 6) {
-                gameDino->isJumped = false;
+                gameDino = GAME_SetDinoNotJump(gameDino);
             } else {
                 gameDino->y = 6;
             }
@@ -79,52 +131,61 @@ Dino *GAME_GetDinoHeight(Dino *gameDino) {
     return gameDino;
 }
 
-// get the picture of dino
+// Get the picture of dino
 Dino *GAME_GetDinoFlag(Dino *gameDino) {
+    // Get another res picture of dino
     if (gameDino->flag == RES_ID_16x16_DINO_1) {
         gameDino->flag = RES_ID_16x16_DINO_2;
     } else if (gameDino->flag == RES_ID_16x16_DINO_2) {
         gameDino->flag = RES_ID_16x16_DINO_1;
     }
 
+    // If the game dino is jumped, return the jump picture
     if (gameDino->isJumped == true) {
         gameDino->flag = RES_ID_16x16_DINO_3;
     }
     return gameDino;
 }
 
-// draw a dino on screen
+// Draw a dino on screen
 Dino *GAME_DrawDino(Dino *gameDino) {
     uint8_t y = gameDino->y;
+    if (gameDino->flag != RES_ID_16x16_DINO_4) {
 
-    // if the dino is in jump status
-    if (gameDino->isJumped == true) {
-        gameDino = GAME_GetDinoHeight(gameDino);
-        // 判断是否有移动
-        if (y > gameDino->y) {
-            OLED_ClearBlockRow(0, y + 1, 16);
-            OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
-            OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
-            gameDino->lastDraw = HAL_GetTick();
-        } else if (y < gameDino->y) {
-            OLED_ClearBlockRow(0, y, 16);
-            OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
-            if (gameDino->y == 6) {
-                gameDino = GAME_SetDinoNotJump(gameDino);
+        // If the dino is in jump status
+        if (gameDino->isJumped == true) {
+            gameDino = GAME_GetDinoHeight(gameDino);
+
+            // Judge if the game dino has move
+            if (y > gameDino->y) {
+                // Rise
+                OLED_ClearBlockRow(0, y + 1, 16);
+                OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
+                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+                gameDino->lastDraw = HAL_GetTick();
+            } else if (y < gameDino->y) {
+                // Down
+                OLED_ClearBlockRow(0, y, 16);
+                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+                gameDino->lastDraw = HAL_GetTick();
             }
+        } else if (GAME_GetDinoShouldDraw(gameDino)) {
+            gameDino = GAME_GetDinoFlag(gameDino);
+
+            // Renew the dino picture(just 0,0 to 8,8)
+            OLED_ClearBlockRow(0, y + 1, 16);
+            OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
             gameDino->lastDraw = HAL_GetTick();
         }
-    } else if (GAME_GetDinoShouldDraw(gameDino)) {
-        gameDino = GAME_GetDinoFlag(gameDino);
-        OLED_ClearBlockRow(0, y + 1, 16);
+    } else {
+        OLED_ClearBlockRow(0, y, 16);
         OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
-        gameDino->lastDraw = HAL_GetTick();
     }
 
     return gameDino;
 }
 
-
+// Get a bool value is the dino should be rerender
 bool GAME_GetDinoShouldDraw(Dino *gameDino) {
     return
             (HAL_GetTick() - gameDino->lastDraw > 100)
