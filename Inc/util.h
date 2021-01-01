@@ -9,9 +9,10 @@
 // dino object struct
 typedef struct _dino {
     bool isJumped;
-    uint64_t jumpTime;
+    uint32_t jumpTime;
     uint8_t flag;
     uint8_t y;
+    uint32_t lastDraw;
 } Dino;
 
 // cactus object struct
@@ -27,11 +28,19 @@ typedef struct _cactus {
 // convert LED to another status
 void LED_toggle();
 
+void GAME_initScreen();
+
+void GAME_drawGameOver();
+
 // get dino height by object pointer game dino
 Dino *GAME_getDinoHeight(Dino *gameDino);
 
+Dino *GAME_setDinoNotJump(Dino* gameDino);
+
 // get dino flag by object pointer game dino
 Dino *GAME_getDinoFlag(Dino *gameDino);
+
+bool GAME_getDinoShouldDraw(Dino *gameDino);
 
 // draw a dino by object pointer dino
 Dino *GAME_drawDino(Dino *gameDino);

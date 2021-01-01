@@ -8,6 +8,18 @@ void LED_toggle() {
     HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 }
 
+void GAME_initScreen() {
+    OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
+}
+
+void GAME_drawGameOver() {
+    OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
+    OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
+    OLED_FillBlockAny(16, 4, RES_SIZE_32x32, RES_ID_32x32_RESTART);
+    OLED_FillBlockAny(90, 1, RES_SIZE_16x16, RES_ID_16x16_DINO_2);
+    return;
+}
+
 // set dino status to jumped
 Dino *GAME_setDinoJump(Dino *gameDino) {
     if (gameDino->isJumped == false) {
@@ -18,10 +30,19 @@ Dino *GAME_setDinoJump(Dino *gameDino) {
     return gameDino;
 }
 
+Dino *GAME_setDinoNotJump(Dino* gameDino) {
+    if (gameDino->isJumped == true) {
+        gameDino->isJumped = false;
+        gameDino->flag = RES_ID_16x16_DINO_1;
+        gameDino->jumpTime = 0;
+    }
+    return gameDino;
+}
+
 // get the height of jumped dino
 Dino *GAME_getDinoHeight(Dino *gameDino) {
     if (gameDino->isJumped) {
-        uint64_t time = HAL_GetTick() - gameDino->jumpTime;
+        uint32_t time = HAL_GetTick() - gameDino->jumpTime;
         if ((time > 50 && time <= 100) || (time > 1275 && time <= 1300)) {
             gameDino->y = 5;
         } else if ((time > 100 && time <= 175) || (time > 1200 && time <= 1275)) {
@@ -45,14 +66,14 @@ Dino *GAME_getDinoHeight(Dino *gameDino) {
 
 // get the picture of dino
 Dino *GAME_getDinoFlag(Dino *gameDino) {
-    if ((HAL_GetTick() & 15) == 0) {
-        if (gameDino->flag == RES_ID_16x16_DINO_1) {
-            gameDino->flag = RES_ID_16x16_DINO_2;
-        } else if (gameDino->flag == RES_ID_16x16_DINO_2) {
-            gameDino->flag = RES_ID_16x16_DINO_1;
-        } else if (gameDino->isJumped == false) {
-            gameDino->flag = RES_ID_16x16_DINO_1;
-        }
+    if (gameDino->flag == RES_ID_16x16_DINO_1) {
+        gameDino->flag = RES_ID_16x16_DINO_2;
+    } else if (gameDino->flag == RES_ID_16x16_DINO_2) {
+        gameDino->flag = RES_ID_16x16_DINO_1;
+    }
+
+    if (gameDino->isJumped == true) {
+        gameDino->flag = RES_ID_16x16_DINO_3;
     }
     return gameDino;
 }
@@ -66,21 +87,34 @@ Dino *GAME_drawDino(Dino *gameDino) {
         gameDino = GAME_getDinoHeight(gameDino);
         // 判断是否有移动
         if (y > gameDino->y) {
+            OLED_ClearBlockRow(0, y + 1, 16);
             OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
             OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+            gameDino->lastDraw = HAL_GetTick();
         } else if (y < gameDino->y) {
-            OLED_ClearBlockAny(0, gameDino->y - 2, RES_SIZE_16x16);
+            OLED_ClearBlockRow(0, y, 16);
             OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+            if (gameDino->y == 6) {
+                gameDino = GAME_setDinoNotJump(gameDino);
+            }
+            gameDino->lastDraw = HAL_GetTick();
         }
-    } else {
-        uint8_t flag = gameDino->flag;
+    } else if (GAME_getDinoShouldDraw(gameDino)) {
         gameDino = GAME_getDinoFlag(gameDino);
-        if (flag != gameDino->flag) {
-            OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
-            OLED_FillBlockAny(0, y, RES_SIZE_16x16, flag);
-        }
+        OLED_ClearBlockRow(0, y + 1, 16);
+        OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
+        gameDino->lastDraw = HAL_GetTick();
     }
+
     return gameDino;
+}
+
+
+bool GAME_getDinoShouldDraw(Dino *gameDino) {
+    return
+            (HAL_GetTick() - gameDino->lastDraw > 100)
+            && (gameDino->isJumped != true)
+            ? true : false;
 }
 
 // random make a cactus return new cactus or NULL

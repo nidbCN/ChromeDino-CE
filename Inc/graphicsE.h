@@ -1,10 +1,11 @@
-/* 
- * 嵌入式OLED图形库，适用于128x64单色点阵屏
- * By Gaein nidb , https://www.gaein.cn
- * 中北大学 | 大数据学院 2007040115李子康
+/*
+ * A graphics library of 128 x 64 monochrome dot matrix OLED display
+ * Created by Gaein nidb, https://www.gaein.cn
+ * North Universal Of China
  */
-#ifndef _GRAPHICS_EMBEDDED_
-#define _GRAPHICS_EMBEDDED_
+
+#ifndef _GRAPHICS_EMBEDDED_H_
+#define _GRAPHICS_EMBEDDED_H_
 
 
 /*------宏定义------*/

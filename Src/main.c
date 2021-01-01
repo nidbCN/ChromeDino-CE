@@ -24,11 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include "universal.h"
 #include "util.h"
+#include "keyboard.h"
 #include "graphicsE.h"
+#include "random.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,6 +71,12 @@ void SystemClock_Config(void);
 int main(void) {
     /* USER CODE BEGIN 1 */
 
+    // Try to init random 10 times.
+    for (int i = 0; i < 10; ++i) {
+        if (RAND_setRandomInit()) {
+            break;
+        }
+    }
     /* USER CODE END 1 */
 
     /* MCU Configuration--------------------------------------------------------*/
@@ -110,10 +116,14 @@ int main(void) {
     gameDino->jumpTime = 0;
     gameDino->flag = RES_ID_16x16_DINO_1;
     gameDino->y = 6;
+    gameDino->lastDraw = 0;
 
     uint16_t score = 0;             // A var to record game scores
-    uint64_t timer = HAL_GetTick(); // A var to record last loop end time
+    uint32_t timer = HAL_GetTick(); // A var to record last loop end time
+    uint16_t interval = RAND_getRandomNumber_uint16(500, 1000);
 
+    GAME_initScreen();
+    OLED_FillBlockInt4(96, 0, 0);
     uint8_t btnHasPressed = false;  // define a bool to record if button has pressed down
     /* USER CODE END 2 */
 
@@ -123,9 +133,11 @@ int main(void) {
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
+        // Draw the dino
+        gameDino = GAME_drawDino(gameDino);
 
         // button jump pressed
-        if (HAL_GPIO_ReadPin(BTN_R_GPIO_Port, BTN_R_Pin) == GPIO_PIN_SET) {
+        if (KB_getJumpBtnStatus() == true) {
             btnHasPressed = true;
             // set game dino status to jumped
             GAME_setDinoJump(gameDino);
@@ -137,41 +149,31 @@ int main(void) {
         }
 
         if (gameCactus != NULL) {
+            uint8_t plusScore = gameCactus->height;
             gameCactus = GAME_drawCactus(gameCactus);
             if (gameCactus == NULL) {
-                ++score;
+                score += plusScore;
                 OLED_FillBlockInt4(96, 0, score);
             }
         } else {
-            uint64_t nowTime = HAL_GetTick();
-            if (nowTime - timer > 1000) {
+            uint32_t nowTime = HAL_GetTick();
+            if (nowTime - timer > interval) {
                 // try to rand a cactus
                 gameCactus = GAME_getCactusRand();
+                interval = RAND_getRandomNumber_uint16(1000, 2000);
                 timer = nowTime;
             }
         }
 
-        gameDino = GAME_drawDino(gameDino);
 
-
-        uint8_t nowTime = HAL_GetTick();
-//        if ((nowTime - timer) < 30) {
-//            HAL_Delay(30 - (nowTime - timer));
-//        }
-
+        // Game over
         if (GAME_getGameStatus(gameDino, gameCactus) == false) {
-            OLED_ClearScreen();
-            while (HAL_GPIO_ReadPin(BTN_L_GPIO_Port, BTN_L_Pin) != GPIO_PIN_SET) {
-                OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
-                OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
-                OLED_FillBlockAny(16, 4, RES_SIZE_32x32, RES_ID_32x32_RESTART);
-                OLED_FillBlockAny(90, 1, RES_SIZE_16x16, RES_ID_16x16_DINO_2);
-                LED_toggle();
-                HAL_Delay(100);
-            }
-            __set_FAULTMASK(1);//关闭总中断
-            NVIC_SystemReset();//请求单片机重启
+            OLED_ClearScreen();         // Clear screen
+            GAME_drawGameOver();        // Draw game over interface
 
+            KB_waitRestartBtnHit(200);     // Wait for restart button pressed
+            __set_FAULTMASK(1);            // Turn off total interrupt
+            NVIC_SystemReset();                     // Request MCU restart
         }
 
     }

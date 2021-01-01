@@ -1,7 +1,7 @@
 /*------头文件------*/
-#include <stdint.h>
 #include <string.h>
-#include "i2c.h"
+
+#include "universal.h"
 #include "graphicsE.h"
 #include "gameRes.h"
 
