@@ -74,7 +74,7 @@ int main(void) {
     // Try to init random 10 times.
     for (int i = 0; i < 10; ++i) {
         if (RAND_SetRandomInit()) {
-            break;
+            break;  // Random init success.
         }
     }
     /* USER CODE END 1 */
@@ -99,68 +99,69 @@ int main(void) {
     MX_I2C1_Init();
     /* USER CODE BEGIN 2 */
 
-    // OLED codes must behind the I2C Init function
-    OLED_SetInit();                     // Init OLED
-    OLED_SetDisplay(OLED_DISPLAY_ON);   // Set OLED display to ON
+    // Attention: OLED codes must behind the I2C Init function.
+    OLED_SetInit();                     // Init OLED.
+    OLED_SetDisplay(OLED_DISPLAY_ON);   // Set OLED display to ON.
 
-    // New a cactus object
+    // New a cactus object.
     Cactus *gameCactus = GAME_GetCactusRand();
 
-
-    // New a game dino object
+    // New a game dino object.
     Dino *gameDino = GAME_InitDino();
 
-    uint16_t score = 0;             // A var to record game scores
-    uint32_t timer = HAL_GetTick(); // A var to record last loop end time
+    uint16_t score = 0;             // Define a var to record game scores.
+    uint32_t timer = HAL_GetTick(); // Define a var to record last loop end time.
+    // Define a var to record random interval number.
     uint16_t interval = GAME_GetRandomNumber_uint16(500, 1000);
 
+    // Clear the screen.
     OLED_ClearScreen();
+    // Start count down(three to zero).
     GAME_CountDown();
-
-
+    // Init the OLED screen.
     GAME_InitScreen();
-    OLED_FillBlockInt4(96, 0, 0);
-    uint8_t btnHasPressed = false;  // define a bool to record if button has pressed down
+    OLED_FillBlockInt4(96, 0, 0);   // Init the score with zero.
+    // Define a bool var to record if button has pressed down(lock).
+    uint8_t btnHasPressed = false;
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
+    // Operation loop
     while (true) {
         /* USER CODE END WHILE */
-
         /* USER CODE BEGIN 3 */
 
-        // Draw the dino
-        gameDino = GAME_DrawDino(gameDino);
+        gameDino = GAME_DrawDino(gameDino); // Draw the dino
 
-        // button jump pressed
+        // Jump button was pressed.
         if (KB_GetJumpBtnStatus() == true) {
-            btnHasPressed = true;
-            // set game dino status to jumped
-            GAME_SetDinoJump(gameDino);
-            // set LED light
+            btnHasPressed = true;       // Lock the button.
+            GAME_SetDinoJump(gameDino); // Set game dino status to jumped.
+            // Set LED On.
             HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
         } else {
-            btnHasPressed = false;
+            btnHasPressed = false;      // Unlock the button.
+            // Set Light Off
             HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
         }
 
-        // Draw a cactus
+        // Try to draw a cactus.
         if (gameCactus != NULL) {
-            uint8_t plusScore = gameCactus->height * 2;     // get score
-            gameCactus = GAME_DrawCactus(gameCactus);       // draw the cactus
+            uint8_t plusScore = gameCactus->height * 2;     // Define a var to record the score.
+            gameCactus = GAME_DrawCactus(gameCactus);       // Draw the cactus.
             if (gameCactus == NULL) {
-                // display the new score
-                score += plusScore;
-                OLED_FillBlockInt4(96, 0, score);
+                score += plusScore;                               // Calculate the new score.
+                OLED_FillBlockInt4(96, 0, score);           // Display the new score.
             }
         } else {
+            // Get now time.
             uint32_t nowTime = HAL_GetTick();
             if (nowTime - timer > interval) {
-                // try to rand a cactus
+                // Try to rand a cactus interval.
                 gameCactus = GAME_GetCactusRand();
-                interval = GAME_GetRandomNumber_uint16(1000, 1500);
-                timer = nowTime;
+                interval = GAME_GetRandomNumber_uint16(1000, 1500);     // Set new interval.
+                timer = nowTime;                                                 // Renew timer
             }
         }
 

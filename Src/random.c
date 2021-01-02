@@ -3,11 +3,11 @@
 // Init the random functions, you should init it after use.
 bool RAND_SetRandomInit() {
     // Random a seed.
-    uint32_t *seed_1 = (uint32_t*)malloc(4);
-    uint32_t *seed_2 = (uint32_t*)malloc(4);
+    uint32_t *seed_1 = (uint32_t *) malloc(4);
+    uint32_t *seed_2 = (uint32_t *) malloc(4);
     uint32_t seed = (*seed_1) | (*seed_2);
 
-    // delete pointers.
+    // Delete pointers.
     free(seed_1);
     free(seed_2);
     seed_1 = NULL;
@@ -20,6 +20,11 @@ bool RAND_SetRandomInit() {
     return seed != 0 ? true : false;
 }
 
+/*
+ * Get the unsigned int 8 random number
+ * arguments: uint8_t
+ *
+ */
 uint8_t GAME_GetRandomNumber_uint8(uint8_t from, uint8_t to) {
     uint8_t size = to - from;
     uint8_t randNum = rand() % size;

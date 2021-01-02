@@ -1,11 +1,11 @@
-/*------头文件------*/
+/*------header files------*/
 #include <string.h>
 
 #include "universal.h"
 #include "graphicsE.h"
 #include "gameRes.h"
 
-/*------宏定义------*/
+/*------macro defination------*/
 
 // 空数据
 #define NULL_DATA (0x00)

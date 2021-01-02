@@ -1,19 +1,31 @@
 #include "universal.h"
 #include "keyboard.h"
 
-// get if jump button is hit
+/*
+ * Get if jump button is hit
+ * arguments: /
+ * return: bool is the button was pressed
+ */
 bool KB_GetJumpBtnStatus() {
     return HAL_GPIO_ReadPin(BTN_R_GPIO_Port, BTN_R_Pin) ? true : false;
 }
 
-// get
+/*
+ * Get if restart button is hit
+ * arguments: /
+ * return: bool is the button was pressed
+ */
 bool KB_GetRestartBtnStatus() {
     return HAL_GPIO_ReadPin(BTN_L_GPIO_Port, BTN_L_Pin) ? true : false;
 }
 
-// wait until jump button is hit
+/*
+ * Wait until jump button was pressed
+ * arguments: uint8_t flush time between each loop
+ * return: void
+ */
 void KB_WaitJumpBtnHit(uint8_t flushTime) {
-    bool status = false;
+    bool status = false;    // Define a var to record status.
     while (status == false) {
         status = KB_GetJumpBtnStatus();
         HAL_Delay(flushTime);
@@ -21,7 +33,11 @@ void KB_WaitJumpBtnHit(uint8_t flushTime) {
     return;
 }
 
-// wait until restart button is hit
+/*
+ * Wait until restart button was pressed
+ * arguments: uint8_t flush time between each loop
+ * return: void
+ */
 void KB_WaitRestartBtnHit(uint8_t flushTime) {
     bool status = false;
     while (status == false) {
