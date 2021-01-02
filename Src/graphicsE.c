@@ -1,47 +1,58 @@
-/*------header files------*/
+/*------Header files------*/
 #include <string.h>
-
 #include "universal.h"
 #include "graphicsE.h"
 #include "gameRes.h"
 
-/*------macro defination------*/
+/*------Macro definition------*/
 
-// 空数据
+// Null data
 #define NULL_DATA (0x00)
-// 填充数据
+// Fill data
 #define FILL_DATA (0xFF)
-// 最大宽度
+// The max width of screen
 #define WIDTH_MAX (128)
-// 最小宽度
+// The max height of screen
 #define HEIGHT_MAX (8)
-// 发送数据超时设置(ms)
+// I2C data operate timeout(ms)
 #define I2C_MEM_WRITE_TIMEOUT (50)
 
-/*------函数定义------*/
+/*------Function definition------*/
 
-/*------OLED相关------*/
+/*------OLED related------*/
 
-// OLED 发送数据
-// 注意：type为 OLED_SEND_DATA 或 OLED_SEND_CMD
+/*
+ * Send data to OLED device.
+ * Arguments: uint8_t type (macro OLED_SEND_DATA or OLED_SEND_CMD)
+ *          , uint8_t *data (a pointer to the data you want send)
+ *          , uint8_t size (length of your data, unit: element)
+ * Return: void
+ */
 void OLED_Send(uint8_t type, uint8_t *data, uint8_t size) {
     HAL_I2C_Mem_Write(&hi2c1, 0x78, type, I2C_MEMADD_SIZE_8BIT, data, size, I2C_MEM_WRITE_TIMEOUT);
 }
 
-// OLED 设置显示开关
-// 注意：option为 OLED_DISPLAY_ON 或 OLED_DISPLAY_OFF
+/*
+ * OLED display switch.
+ * Arguments: uint8_t option (macro OLED_DISPLAY_ON or OLED_DISPLAY_OFF)
+ * Return: void
+ */
 void OLED_SetDisplay(uint8_t option) {
-    // command on of oled screen
+    // command on of oled screen.
     uint8_t CMD_DataOn[3] = {0X8D, 0X14, 0XAF};
-    // command off of oled screen
+    // command off of oled screen.
     uint8_t CMD_DataOff[3] = {0X8D, 0X10, 0XAE};
     uint8_t *CMD_Data = option ? CMD_DataOn : CMD_DataOff;
     OLED_Send(OLED_SEND_CMD, CMD_Data, 3);
 }
 
-// OLED设置初始化
+/*
+ * Init the OLED device
+ * Arguments: /
+ * Return: void
+ */
 void OLED_SetInit() {
-    // command init of oled screen
+    // command init of oled screen.
     uint8_t CMD_Data[] = {
             0xAE, 0x00, 0x10, 0x40, 0xB0, 0x81, 0xFF, 0xA1,
             0xA6, 0xA8, 0x3F, 0xC8, 0xD3, 0x00, 0xD5, 0x80,
@@ -52,7 +63,11 @@ void OLED_SetInit() {
     OLED_Send(OLED_SEND_CMD, CMD_Data, 27);
 }
 
-// 设置光标位置(x,y)
+/*
+ * Set cursor position on OLED screen.
+ * Arguments: uint8_t x (x-coordinate), uint8_t y (y-coordinate)
+ * Return: void
+ */
 void OLED_SetPosition(uint8_t x, uint8_t y) {
     // command set draw position of oled screen.x and y is position of screen.
     uint8_t CMD_Data[3] = {
@@ -63,12 +78,16 @@ void OLED_SetPosition(uint8_t x, uint8_t y) {
     OLED_Send(OLED_SEND_CMD, CMD_Data, 3);
 }
 
-// OLED设置开启
+/*------Fill block ------*/
 
-/*------填充相关------*/
-
-// 从坐标(x,y)处向右下填充 width x 8 个像素大小的内容 res数组
-// 注意：x为负数只渲染正数部分
+/*
+ * Fill width x 8 pixels from (x, y) down to right.
+ * Arguments: int8_t x (x-coordinate, it can be negative but only render the x>0 parts)
+ *          , uint8_t y (y-coordinate)
+ *          , uint8_t width (fill area width)
+ *          , uint8_t *res (fill resource pointer)
+ * Return: void
+ */
 void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     uint8_t i = 0;
     uint8_t *renderRes = res;
@@ -88,7 +107,14 @@ void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     }
 }
 
-// 从坐标(x,y)处向右下填充 RES_SIZE_AxB: AxB 个像素大小的内容 RES_CONTENT
+/*
+ * Fill width RES_SIZE_AxB: AxB pixels from (x, y) down to right.
+ * Arguments: int8_t x (x-coordinate, it can be negative but only render the x>0 parts)
+ *          , uint8_t y (y-coordinate)
+ *          , uint8_t type (macro RES_SIZE_AxB)
+ *          , uint8_t res (macro RES_ID_AxB_C)
+ * Return: void
+ */
 void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
     uint8_t width = 0;
     uint8_t height = 0;
@@ -147,7 +173,13 @@ void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
     }
 }
 
-//  从坐标(x,y)处向右下填充4位数字
+/*
+ * Fill 4-digits from (x, y) down to right.
+ * Arguments: int8_t x (x-coordinate, it can be negative but only render the x>0 parts)
+ *          , uint8_t y (y-coordinate)
+ *          , uint16_t num (a number which will be filled)
+ * Return: void
+ */
 void OLED_FillBlockInt4(int8_t x, uint8_t y, uint16_t num) {
     if (num < 10000) {
         // 乘方表
@@ -161,14 +193,24 @@ void OLED_FillBlockInt4(int8_t x, uint8_t y, uint16_t num) {
     }
 }
 
-// 从坐标(x,y)处向右下填充一个字符
+/*
+ * Fill a 8x16 char from (x, y) down to right.
+ * Arguments: int8_t x (x-coordinate, it can be negative but only render the x>0 parts)
+ *          , uint8_t y (y-coordinate)
+ *          , uint16_t ch (a char which will be filled)
+ * Return: void
+ */
 void OLED_FillBlockChar(int8_t x, uint8_t y, uint8_t ch) {
     for (uint8_t i = 0; i < 2; ++i) {
         OLED_FillBlockRow(x, y + i, 8, RES_F8x16[ch + i]);
     }
 }
 
-// 填充整块屏幕
+/*
+ * Fill all the OLED screen.
+ * Arguments: /
+ * Return: void
+ */
 void OLED_FillScreen() {
     uint8_t NULL_Data[WIDTH_MAX];
     memset(NULL_Data, FILL_DATA, WIDTH_MAX);

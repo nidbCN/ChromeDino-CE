@@ -233,6 +233,11 @@ void Error_Handler(void) {
     /* User can add his own implementation to report the HAL error return state */
     __disable_irq();
     while (1) {
+        // Light the LED
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        HAL_Delay(5000);            // Delay 5s
+        __set_FAULTMASK(1);      // Turn off total interrupt
+        NVIC_SystemReset();               // Request MCU restart
     }
     /* USER CODE END Error_Handler_Debug */
 }

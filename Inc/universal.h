@@ -30,13 +30,13 @@
 #define RES_ID_16x16_DINO_3 (4)
 // 16x16 dino (died)
 #define RES_ID_16x16_DINO_4 (6)
+
 // 16x16 mid-size cactus 1
 #define RES_ID_16x16_CACTUS_1 (8)
 // 16x16 mid-size cactus 2
 #define RES_ID_16x16_CACTUS_2 (10)
 // 16x16 mid-size cactus 3
 #define RES_ID_16x16_CACTUS_3 (12)
-
 
 /*------16x32 resource------*/
 
@@ -71,7 +71,7 @@
 // 32x64 font '3'
 #define RES_ID_32x64_3 (24)
 
-/*------resource size macro------*/
+/*------Resource size macro------*/
 #define RES_SIZE_8x16 (0)
 #define RES_SIZE_16x16 (1)
 #define RES_SIZE_16x32 (2)
@@ -80,13 +80,13 @@
 #define RES_SIZE_64x32 (5)
 #define RES_SIZE_64x64 (6)
 
-// system lib include
+// System lib include
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-// stm32 lib include
+// STM32 lib include
 #include "i2c.h"
 #include "gpio.h"
 

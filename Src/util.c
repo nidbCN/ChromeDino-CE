@@ -10,20 +10,20 @@
 #include "random.h"
 
 /*
- * Init the OLED screen for game
- * argument: /
- * return: void
+ * Init the OLED screen for game.
+ * Arguments: /
+ * Return: void
  */
 void GAME_InitScreen() {
-    OLED_ClearScreen();                 // Clear OLED screen
+    OLED_ClearScreen();                 // Clear OLED screen.
+    // Draw a game dino.
     OLED_FillBlockAny(0, 6, RES_SIZE_16x16, RES_ID_16x16_DINO_1);
-    return;
 }
 
 /*
- * Init a new dino
- * argument: /
- * return: Dino* (a new malloced dino)
+ * Init a new dino.
+ * Arguments: /
+ * Return: Dino* (a new malloced dino)
  */
 Dino *GAME_InitDino() {
     // Malloc a new dino
@@ -39,6 +39,11 @@ Dino *GAME_InitDino() {
     return gameDino;
 }
 
+/*
+ * Game count down three to zero.
+ * Arguments: /
+ * Return: void
+ */
 void GAME_CountDown() {
     const uint8_t x = 48;
     const uint8_t y = 0;
@@ -60,22 +65,91 @@ void GAME_CountDown() {
 }
 
 /*
- * Draw the game over interface
- * argument: /
- * return: void
+ * Draw the game over interface.
+ * Arguments: /
+ * Return: void
  */
 void GAME_DrawGameOver() {
     OLED_FillBlockAny(0, 0, RES_SIZE_64x32, RES_ID_64x32_GAME);
     OLED_FillBlockAny(64, 4, RES_SIZE_64x32, RES_ID_64x32_OVER);
     OLED_FillBlockAny(16, 4, RES_SIZE_32x32, RES_ID_32x32_RESTART);
     OLED_FillBlockAny(90, 1, RES_SIZE_16x16, RES_ID_16x16_DINO_4);
-    return;
 }
 
 /*
- * Set dino status to jumped
- * argument: Dino* (input dino pointer)
- * return: Dino* (a dino has inited)
+ * Draw a dino on screen.
+ * Arguments: Dino* (input a dino you want to draw)
+ * Return: Dino* (return a dino has been auto draw)
+ */
+Dino *GAME_DrawDino(Dino *gameDino) {
+    uint8_t y = gameDino->y;
+    if (gameDino->flag != RES_ID_16x16_DINO_4) {
+
+        // If the dino is in jump status
+        if (gameDino->isJumped == true) {
+            gameDino = GAME_GetDinoHeight(gameDino);
+
+            // Judge if the game dino has move
+            if (y > gameDino->y) {
+                // Rise
+                OLED_ClearBlockRow(0, y + 1, 16);
+                OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
+                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+                gameDino->lastDraw = HAL_GetTick();
+            } else if (y < gameDino->y) {
+                // Down
+                OLED_ClearBlockRow(0, y, 16);
+                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
+                gameDino->lastDraw = HAL_GetTick();
+            }
+        } else if (GAME_GetDinoShouldDraw(gameDino)) {
+            gameDino = GAME_GetDinoFlag(gameDino);
+
+            // Renew the dino picture(just 0,0 to 8,8)
+            OLED_ClearBlockRow(0, y + 1, 16);
+            OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
+            gameDino->lastDraw = HAL_GetTick();
+        }
+    } else {
+        OLED_ClearBlockRow(0, y, 16);
+        OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
+    }
+
+    return gameDino;
+}
+
+/*
+ * Draw a cactus, and make it left
+ * Arguments: Cactus* (input a cactus which will be drawn)
+ * Return: Cactus* (a cactus has been drawn)
+ */
+Cactus *GAME_DrawCactus(Cactus *gameCactus) {
+    // Fill block a cactus
+    OLED_FillBlockAny(gameCactus->x, gameCactus->y, gameCactus->size, gameCactus->flag);
+
+    if (gameCactus->x + gameCactus->width < 127) {
+        for (uint8_t i = 0; i < 8 - gameCactus->y; ++i) {
+            // clear old data
+            OLED_ClearBlockRow(gameCactus->x + gameCactus->width, gameCactus->y + i, 2);
+        }
+    }
+
+    if (gameCactus->height == 2) {
+        HAL_Delay(2);
+    }
+
+    --(gameCactus->x);
+    if (gameCactus->x < -gameCactus->width) {
+        free(gameCactus);
+        gameCactus = NULL;
+    }
+    return gameCactus;
+}
+
+/*
+ * Set dino status to jumped.
+ * Arguments: Dino* (input dino pointer)
+ * Return: Dino* (a dino has inited)
  */
 Dino *GAME_SetDinoJump(Dino *gameDino) {
     if (gameDino->isJumped == false) {
@@ -131,7 +205,11 @@ Dino *GAME_GetDinoHeight(Dino *gameDino) {
     return gameDino;
 }
 
-// Get the picture of dino
+/*
+ * Get the picture of dino.
+ * Arguments: Dino* (input a dino)
+ * Return: Dino* (return a dino which flag has been edit)
+ * */
 Dino *GAME_GetDinoFlag(Dino *gameDino) {
     // Get another res picture of dino
     if (gameDino->flag == RES_ID_16x16_DINO_1) {
@@ -147,45 +225,11 @@ Dino *GAME_GetDinoFlag(Dino *gameDino) {
     return gameDino;
 }
 
-// Draw a dino on screen
-Dino *GAME_DrawDino(Dino *gameDino) {
-    uint8_t y = gameDino->y;
-    if (gameDino->flag != RES_ID_16x16_DINO_4) {
-
-        // If the dino is in jump status
-        if (gameDino->isJumped == true) {
-            gameDino = GAME_GetDinoHeight(gameDino);
-
-            // Judge if the game dino has move
-            if (y > gameDino->y) {
-                // Rise
-                OLED_ClearBlockRow(0, y + 1, 16);
-                OLED_ClearBlockAny(0, y, RES_SIZE_16x16);
-                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
-                gameDino->lastDraw = HAL_GetTick();
-            } else if (y < gameDino->y) {
-                // Down
-                OLED_ClearBlockRow(0, y, 16);
-                OLED_FillBlockAny(0, gameDino->y, RES_SIZE_16x16, gameDino->flag);
-                gameDino->lastDraw = HAL_GetTick();
-            }
-        } else if (GAME_GetDinoShouldDraw(gameDino)) {
-            gameDino = GAME_GetDinoFlag(gameDino);
-
-            // Renew the dino picture(just 0,0 to 8,8)
-            OLED_ClearBlockRow(0, y + 1, 16);
-            OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
-            gameDino->lastDraw = HAL_GetTick();
-        }
-    } else {
-        OLED_ClearBlockRow(0, y, 16);
-        OLED_FillBlockAny(0, y, RES_SIZE_16x16, gameDino->flag);
-    }
-
-    return gameDino;
-}
-
-// Get a bool value is the dino should be rerender
+/*
+ * Get a dino if it should be drawn.
+ * Arguments: Dino* (input a dino which you want to judge)
+ * Return: bool (Should - true, Should not - false)
+ */
 bool GAME_GetDinoShouldDraw(Dino *gameDino) {
     return
             (HAL_GetTick() - gameDino->lastDraw > 100)
@@ -193,8 +237,12 @@ bool GAME_GetDinoShouldDraw(Dino *gameDino) {
             ? true : false;
 }
 
-// random make a cactus return new cactus or NULL
-Cactus *GAME_GetCactusRand() {
+/*
+ * Get a random cactus.
+ * Arguments: /
+ * Return: Cactus* (a random cactus object)
+ */
+ Cactus *GAME_GetCactusRand() {
     // 小于10为8x16，大于10为16x32
     // resource id table
     int8_t table[11] = {
@@ -227,31 +275,11 @@ Cactus *GAME_GetCactusRand() {
     return ret;
 }
 
-// draw a cactus no screen and clear the last cactus
-Cactus *GAME_DrawCactus(Cactus *gameCactus) {
-    // Fill block a cactus
-    OLED_FillBlockAny(gameCactus->x, gameCactus->y, gameCactus->size, gameCactus->flag);
-
-    if (gameCactus->x + gameCactus->width < 127) {
-        for (uint8_t i = 0; i < 8 - gameCactus->y; ++i) {
-            // clear old data
-            OLED_ClearBlockRow(gameCactus->x + gameCactus->width, gameCactus->y + i, 2);
-        }
-    }
-
-    if (gameCactus->height == 2) {
-        HAL_Delay(2);
-    }
-
-    --(gameCactus->x);
-    if (gameCactus->x < -gameCactus->width) {
-        free(gameCactus);
-        gameCactus = NULL;
-    }
-    return gameCactus;
-}
-
-// get the game status if it over
+/*
+ * Get game status, judge if it can be continued.
+ * Arguments: Dino* (game used dino object pointer), Cactus (game used cactus object pointer)
+ * Return: bool (continue - true, failed - false)
+ */
 bool GAME_GetGameStatus(Dino *gameDino, Cactus *gameCactus) {
     bool ret = true;
     if (gameCactus->x <= 16 && gameCactus != NULL) {

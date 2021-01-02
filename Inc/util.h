@@ -1,58 +1,112 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// define dino status flag
-#define FLAG_DINO_STATUS_LEFT 0
-#define FLAG_DINO_STATUS_RIGHT 1
-#define FLAG_DINO_STATUS_STOP 2
-
-// dino object struct
-typedef struct _dino {
-    bool isJumped;
-    uint32_t jumpTime;
-    uint8_t flag;
-    uint8_t y;
-    uint32_t lastDraw;
+// Dino object struct.
+typedef struct struct_dino {
+    bool isJumped;      // Is jumped
+    uint32_t jumpTime;  // Jump start time
+    uint8_t flag;       // Flag of dino
+    uint8_t y;          // y-coordinate of dino
+    uint32_t lastDraw;  // Last draw time
 } Dino;
 
 // cactus object struct
-typedef struct _cactus {
-    uint8_t width;
-    uint8_t height;
-    uint8_t size;
-    uint8_t flag;
-    int8_t x;
-    uint8_t y;
+typedef struct struct_cactus {
+    uint8_t width;      // Width of cactus
+    uint8_t height;     // Height of cactus
+    uint8_t size;       // Size macro of cactus
+    uint8_t flag;       // Flag macro of cactus
+    int8_t x;           // x-coordinate of cactus
+    uint8_t y;          // y-coordinate of cactus
 } Cactus;
 
-// convert LED to another status
-void LED_toggle();
-
-void GAME_CountDown();
-
+/*
+ * Init the OLED screen for game.
+ * Arguments: /
+ * Return: void
+ */
 void GAME_InitScreen();
 
+/*
+ * Init a new dino.
+ * Arguments: /
+ * Return: Dino* (a new malloced dino)
+ */
 Dino *GAME_InitDino();
 
+/*
+ * Game count down three to zero.
+ * Arguments: /
+ * Return: void
+ */
+void GAME_CountDown();
+
+/*
+ * Draw the game over interface.
+ * Arguments: /
+ * Return: void
+ */
 void GAME_DrawGameOver();
 
-// get dino height by object pointer game dino
-Dino *GAME_GetDinoHeight(Dino *gameDino);
-
-Dino *GAME_SetDinoNotJump(Dino *gameDino);
-
-// get dino flag by object pointer game dino
-Dino *GAME_GetDinoFlag(Dino *gameDino);
-
-bool GAME_GetDinoShouldDraw(Dino *gameDino);
-
-// draw a dino by object pointer dino
+/*
+ * Draw a dino on screen.
+ * Arguments: Dino* (input a dino you want to draw)
+ * Return: Dino* (return a dino has been auto draw)
+ */
 Dino *GAME_DrawDino(Dino *gameDino);
 
-Dino *GAME_SetDinoJump(Dino *gameDino);
-
-Cactus *GAME_GetCactusRand();
-
+/*
+ * Draw a cactus, and make it left
+ * Arguments: Cactus* (input a cactus which will be drawn)
+ * Return: Cactus* (a cactus has been drawn)
+ */
 Cactus *GAME_DrawCactus(Cactus *gameCactus);
 
+/*
+ * Set dino status to jumped.
+ * Arguments: Dino* (input dino pointer)
+ * Return: Dino* (a dino has inited)
+ */
+Dino *GAME_SetDinoJump(Dino *gameDino);
+
+/*
+ * Set dino status to not jumped
+ * argument: Dino* (input dino pointer)
+ * return: Dino* (a dino has set to not jump)
+ */
+Dino *GAME_SetDinoNotJump(Dino *gameDino);
+
+/*
+ * Get the height of jumped dino
+ * argument: Dino* (input dino pointer)
+ * return: Dino* (a dino has set to not jump)
+ */
+Dino *GAME_GetDinoHeight(Dino *gameDino);
+
+/*
+ * Get the picture of dino.
+ * Arguments: Dino* (input a dino)
+ * Return: Dino* (return a dino which flag has been edit)
+ * */
+Dino *GAME_GetDinoFlag(Dino *gameDino);
+
+/*
+ * Get a dino if it should be drawn.
+ * Arguments: Dino* (input a dino which you want to judge)
+ * Return: bool (Should - true, Should not - false)
+ */
+bool GAME_GetDinoShouldDraw(Dino *gameDino);
+
+/*
+ * Get a random cactus.
+ * Arguments: /
+ * Return: Cactus* (a random cactus object)
+ */
+Cactus *GAME_GetCactusRand();
+
+/*
+ * Get game status, judge if it can be continued.
+ * Arguments: Dino* (game used dino object pointer), Cactus (game used cactus object pointer)
+ * Return: bool (continue - true, failed - false)
+ */
 bool GAME_GetGameStatus(Dino *gameDino, Cactus *gameCactus);
