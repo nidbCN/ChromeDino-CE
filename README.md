@@ -1,5 +1,7 @@
 # Chrome Dino C Embedded
 
+![vlcsnap-2024-12-16-16h46m24s257](https://github.com/user-attachments/assets/1b78a027-8b0b-4bfc-8a05-13fad53380bb)
+
 运行在单片机上的谷歌 Chrome 浏览器小恐龙游戏。原游戏见谷歌浏览器 chrome://dino
 
 中北大学大数据学院（计算机科学与技术学院）2020 级 C 语言程序设计课设一等奖。
