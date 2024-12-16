@@ -1,27 +1,41 @@
 # Chrome Dino C Embedded
 
 运行在单片机上的谷歌 Chrome 浏览器小恐龙游戏。原游戏见谷歌浏览器 chrome://dino
-中北大学大数据学院 20 级菜鸡的 C 语言程序设计课设
 
-## 硬件
+中北大学大数据学院（计算机科学与技术学院）2020 级 C 语言程序设计课设一等奖。
 
-1. 单片机：STM32F103C8T6
-2. 显示屏：128x64 单色点阵 OLED 显示屏
-3. 电阻：2kΩ电阻
-4. 开关：6mm六脚微动贴片开关
+This is a chrome dino game running on STM32 MCU. Original game see: [chrome://dino](chrome://dino).
 
-## 功能
+First prize in the 2020 C language programming course offered by the School of Big Data (School of Computer Science and Technology) at North China University.
 
-- [x] 点亮
-- [x] 画面移动
-- [x] 恐龙跳跃
-- [x] 随机生成仙人掌
-- [ ] 随机生成飞鸟
-- [x] 游戏计分
-- [x] 游戏结束与重新开始
-- [ ] 配合蜂鸣器实现音效
+## Hardwares
 
-## 协议
+1. MUC: STM32F103C8T6
+2. Screen: Monochrome dot matrix OLED screen
 
-基于[GNU General Public License(GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html)开源，详见`LICENSE`  
+### BOM list
+
+TODO
+
+## Features
+
+- [x] Random generate cactus.
+- [x] Jump animation effects.
+- [x] Point count.
+- [x] Game over screen and restart.
+- [ ] Random generate birds.
+- [ ] 8bit music whit buzzer.
+
+## Todos
+
+- [ ] Document
+- [ ] Use system interruption to replace keyboard scan
+
+## LICENSE
+
+[GNU General Public License(GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
 ![GPL V3 LOGO](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)
+
+Free as in freedom
+

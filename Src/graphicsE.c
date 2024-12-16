@@ -91,7 +91,8 @@ void OLED_SetPosition(uint8_t x, uint8_t y) {
 void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     uint8_t i = 0;
     uint8_t *renderRes = res;
-    // 跳过渲染x<0的部分
+
+    // ignore x<0
     if (x < 0) {
         i = -x;
         renderRes += i;
@@ -101,7 +102,7 @@ void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
     // 防止出界
     if (y < HEIGHT_MAX) {
         width = x + width > WIDTH_MAX ? WIDTH_MAX - x : width;
-        OLED_SetPosition(x, y); // 设置光标
+        OLED_SetPosition(x, y);
         OLED_Send(OLED_SEND_DATA, renderRes, width - i);
 
     }
@@ -118,7 +119,8 @@ void OLED_FillBlockRow(int8_t x, uint8_t y, uint8_t width, uint8_t *res) {
 void OLED_FillBlockAny(int8_t x, uint8_t y, uint8_t type, uint8_t res) {
     uint8_t width = 0;
     uint8_t height = 0;
-    // 判断类型
+    
+    // resource type
     switch (type) {
         case RES_SIZE_8x16:
             width = 8;
